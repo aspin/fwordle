@@ -1,7 +1,7 @@
 from aiohttp import web
 
 
-class SocketServer:
+class WsServer:
     _app: web.Application
 
     def __init__(self):
@@ -11,15 +11,18 @@ class SocketServer:
         ])
 
     def run(self):
-        web.run_app(self._app)
+        web.run_app(self._app, port=9000)
 
     async def handle_ws(self, request: web.Request):
         ws = web.WebSocketResponse()
         await ws.prepare(request)
 
+        print("got new connection!")
+
         async for msg in ws:
+            print(f"got message: {msg}")
             await ws.send_str("hello world")
 
 
-def build() -> SocketServer:
-    return SocketServer()
+def build() -> WsServer:
+    return WsServer()
