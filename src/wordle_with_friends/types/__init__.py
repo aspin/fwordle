@@ -1,0 +1,2 @@
+PlayerId = str
+SessionId = str
