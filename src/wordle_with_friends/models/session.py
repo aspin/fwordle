@@ -2,6 +2,7 @@ import uuid
 from typing import Any, Dict, List
 
 from src.wordle_with_friends import serializer
+from src.wordle_with_friends.models.player_action import PlayerAction
 from src.wordle_with_friends.models.game_parameters import GameParameters
 
 
@@ -29,6 +30,9 @@ class Session(serializer.Custom):
         """
         self.players.remove(player_id)
         return len(self.players) == 0
+
+    def act(self, player_id: str, action: PlayerAction):
+        return
 
     def to_json(self) -> Dict[str, Any]:
         return {"id": self.id, "players": self.players}

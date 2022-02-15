@@ -26,6 +26,7 @@ def decode(model_class: Type[T], model_params: Dict[str, Any], model_case: Case 
     version knows about are loaded.
 
     It's best not to dive too deeply into this class, as it is not particularly sane.
+    TODO: consider replace this with json.loads Decoder
 
     :param model_class: class of the model to load into
     :param model_params: attributes from the retrieved model to load

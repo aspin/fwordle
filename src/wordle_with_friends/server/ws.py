@@ -1,8 +1,10 @@
 import logging
+from typing import cast
 
+import aiohttp
 from aiohttp import web
 
-from src.wordle_with_friends import serializer, config
+from src.wordle_with_friends import serializer, config, models
 from src.wordle_with_friends.server.manager import SessionManager
 
 logger = logging.getLogger(__name__)
@@ -48,9 +50,11 @@ class WsServer:
         await ws.send_json(self._manager.game_parameters(session_id), dumps=serializer.dumps)
 
         try:
+            msg: aiohttp.WSMessage
             async for msg in ws:
-                logger.debug("received message %s", msg)
-                await ws.send_str("pong")
+                action = serializer.decodes(models.PlayerAction, msg.data)
+                logger.debug("received action %s", action)
+                self._manager.queue_action(session_id, player_id, action)
         finally:
             self._manager.remove_player(session_id, player_id)
 

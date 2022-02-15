@@ -25,7 +25,13 @@ class SessionManager:
     def create_new(self) -> models.Session:
         session = models.Session.new()
         self.sessions[session.id] = session
+
+        # TODO: prepare a timeout if session is never used
         return session
+
+    def queue_action(self, session_id: str, player_id: str, action: models.PlayerAction):
+        # TODO: asyncio queue for in order processing?
+        self.sessions[session_id].act(player_id, action)
 
     def add_player(self, session_id: str) -> str:
         self._cancel_session_closing(session_id)
