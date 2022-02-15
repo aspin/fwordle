@@ -1,8 +1,11 @@
 import asyncio
+import logging
 from asyncio import Future
 from typing import Dict
 
 from src.wordle_with_friends import models
+
+logger = logging.getLogger(__name__)
 
 
 class SessionManager:
@@ -33,6 +36,9 @@ class SessionManager:
         if empty:
             self._mark_for_close(session_id)
 
+    def game_parameters(self, session_id: str) -> models.GameParameters:
+        return self.sessions[session_id].current_parameters
+
     def _mark_for_close(self, session_id: str):
         """
         Prepares to close the session if no activity during the timeout.
@@ -42,6 +48,11 @@ class SessionManager:
 
         :param session_id: session to close
         """
+        logger.debug(
+            "session %s is now empty: will close in %s seconds if no further activity",
+            session_id,
+            self._closing_timeout_s,
+        )
         self._cancel_session_closing(session_id)
         self._closing_tasks[session_id] = asyncio.create_task(
             self._wait_and_close(session_id, self._closing_timeout_s)
@@ -54,5 +65,5 @@ class SessionManager:
 
     async def _wait_and_close(self, session_id: str, timeout: int):
         await asyncio.sleep(timeout)
+        logger.debug("session %s is now closed", session_id)
         self.sessions.pop(session_id, None)
-
