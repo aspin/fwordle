@@ -5,6 +5,7 @@ from typing import Dict, Type, TypeVar, Any, List, Optional, Union, Set
 
 import humps
 
+from src.wordle_with_friends.serializer import encoder
 from src.wordle_with_friends.serializer.case import Case
 
 T = TypeVar("T")
@@ -26,7 +27,6 @@ def decode(model_class: Type[T], model_params: Dict[str, Any], model_case: Case 
     version knows about are loaded.
 
     It's best not to dive too deeply into this class, as it is not particularly sane.
-    TODO: consider replace this with json.loads Decoder
 
     :param model_class: class of the model to load into
     :param model_params: attributes from the retrieved model to load
@@ -36,15 +36,23 @@ def decode(model_class: Type[T], model_params: Dict[str, Any], model_case: Case 
     :return: instance of model class
     """
     try:
+        if issubclass(model_class, encoder.Custom):
+            return model_class.from_json(model_params)
+
         attributes = {}
-        for attribute in dataclasses.fields(model_class):
+        if dataclasses.is_dataclass(model_class):
+            fields = {attribute.name: attribute.type for attribute in dataclasses.fields(model_class)}
+        else:
+            fields = model_class.__annotations__
+
+        for attribute_name, attribute_type in fields.items():
             if model_case == Case.SNAKE:
-                model_attribute_name = attribute.name
+                model_attribute_name = attribute_name
             else:
-                model_attribute_name = humps.camelize(attribute.name)
+                model_attribute_name = humps.camelize(attribute_name)
             if model_attribute_name in model_params:
-                attributes[attribute.name] = _load_attribute(
-                    attribute.type, model_params[model_attribute_name], model_case=model_case
+                attributes[attribute_name] = _load_attribute(
+                    attribute_type, model_params[model_attribute_name], model_case=model_case
                 )
         return model_class(**attributes)
     except Exception as e:

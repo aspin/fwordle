@@ -27,7 +27,7 @@ async def connect_session(session_id: str):
     ws = await session.ws_connect(f"ws://127.0.0.1:9000/session/{session_id}")
 
     game_parameters = await ws.receive()
-    logger.info("session %s parameters: %s", session_id, game_parameters)
+    logger.info("session %s parameters: %s", session_id, game_parameters.data)
 
     msg: aiohttp.WSMessage
     while True:

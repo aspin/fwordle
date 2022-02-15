@@ -11,8 +11,15 @@ class Simple:
 
 
 class Custom:
+    def __init__(self, *args, **kwargs):
+        pass
+
     def to_json(self) -> Dict[str, Any]:
         return self.__dict__
+
+    @classmethod
+    def from_json(cls, dict_args: Dict[str, Any]) -> "Custom":
+        return Custom(**dict_args)
 
 
 class EnhancedJSONEncoder(json.JSONEncoder):
