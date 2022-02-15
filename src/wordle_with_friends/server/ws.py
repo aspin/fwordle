@@ -34,6 +34,7 @@ class WsServer:
         return web.json_response(session, dumps=serializer.dumps)
 
     async def handle_session(self, request: web.Request) -> web.StreamResponse:
+        # player must be added and session kept alive before returning control to event loop
         session_id: str = request.match_info["session_id"]
         if session_id not in self._manager:
             raise web.HTTPNotFound()
