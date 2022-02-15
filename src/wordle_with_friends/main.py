@@ -1,4 +1,4 @@
-from src.wordle_with_friends import server
+from src.wordle_with_friends import server, config
 
 
 def main():
@@ -7,5 +7,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # asyncio.get_event_loop().run_until_complete(main())
+    config.setup_logger()
     main()
