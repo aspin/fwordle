@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import uuid
 from asyncio import Future
 from typing import List, Tuple
@@ -10,6 +11,9 @@ from src.wordle_with_friends.wtypes.common import PlayerId, SessionId, ALL_PLAYE
 from src.wordle_with_friends.wtypes.game_parameters import GameParameters
 from src.wordle_with_friends.wtypes.player import Player
 from src.wordle_with_friends.wtypes.game import PlayerAction, GameEvent, Game
+
+
+logger = logging.getLogger(__name__)
 
 
 class Session:
@@ -70,12 +74,17 @@ class Session:
     async def _process_actions(self):
         while True:
             player_id, action = await self._action_queue.get()
+            logger.debug("[S:%s][P:%s] processing action: %s", self.id, player_id, action)
             self.game.process_action(player_id, action)
 
     async def _process_events(self):
         while True:
-            broadcast = await self.game.event_queue().get()
-            await self.broadcast(broadcast.players, broadcast.event)
+            try:
+                broadcast = await self.game.event_queue().get()
+                logger.debug("[S:%s] processing broadcast: %s", self.id, broadcast)
+                await self.broadcast(broadcast.players, broadcast.event)
+            except Exception as e:
+                logger.error(e)
 
     @classmethod
     def new(cls, game: Game) -> "Session":

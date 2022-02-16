@@ -31,10 +31,11 @@ async def connect_session(session_id: str):
 
     msg: aiohttp.WSMessage
     while True:
-        await ws.send_json(wtypes.PlayerAction("ping", []), dumps=serializer.dumps)
+        logger.info("sending letter to server...")
+        await ws.send_json(wtypes.PlayerAction("ADD_LETTER", "a"), dumps=serializer.dumps)
         msg = await ws.receive()
         logger.info("response from server: %s", msg.data)
-        await asyncio.sleep(5)
+        await asyncio.sleep(0.5)
 
 
 if __name__ == "__main__":

@@ -53,9 +53,9 @@ class WsServer:
             msg: aiohttp.WSMessage
             async for msg in ws:
                 action = serializer.decodes(wtypes.PlayerAction, msg.data)
-                logger.debug("received action %s", action)
                 await self._manager.queue_action(session_id, player_id, action)
         finally:
+            logger.debug("%s has left session %s", player_id, session_id)
             self._manager.remove_player(session_id, player_id)
 
         return ws
