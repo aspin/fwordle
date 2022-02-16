@@ -8,3 +8,9 @@ from src.wordle_with_friends import serializer
 class PlayerAction(serializer.Simple):
     action: str
     params: Any
+
+
+@dataclass
+class GameEvent(serializer.Simple):
+    event: str
+    params: Any

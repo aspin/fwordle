@@ -31,14 +31,14 @@ class SessionManager:
         # TODO: prepare a timeout if session is never used
         return session
 
-    def queue_action(
-        self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId, action: models.PlayerAction
+    async def queue_action(
+        self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId, action: wtypes.PlayerAction
     ):
-        # TODO: asyncio queue for in order processing?
-        pass
-        # self.sessions[session_id].act(player_id, action)
+        await self.sessions[session_id].queue_action(player_id, action)
 
-    def add_player(self, session_id: wtypes.SessionId, ws: web.WebSocketResponse) -> wtypes.PlayerId:
+    def add_player(
+        self, session_id: wtypes.SessionId, ws: web.WebSocketResponse
+    ) -> wtypes.PlayerId:
         self._cancel_session_closing(session_id)
         return self.sessions[session_id].add_player(ws)
 

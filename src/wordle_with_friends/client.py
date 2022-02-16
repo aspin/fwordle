@@ -3,7 +3,7 @@ import logging
 
 import aiohttp
 
-from src.wordle_with_friends import serializer, models, config
+from src.wordle_with_friends import serializer, models, config, wtypes
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ async def connect_session(session_id: str):
 
     msg: aiohttp.WSMessage
     while True:
-        await ws.send_json(models.PlayerAction("ping", []), dumps=serializer.dumps)
+        await ws.send_json(wtypes.PlayerAction("ping", []), dumps=serializer.dumps)
         msg = await ws.receive()
         logger.info("response from server: %s", msg.data)
         await asyncio.sleep(5)
