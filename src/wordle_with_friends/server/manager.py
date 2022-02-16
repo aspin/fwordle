@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class SessionManager:
-    sessions: Dict[wtypes.SessionId, models.Session]
+    sessions: Dict[wtypes.SessionId, wtypes.Session]
 
     _closing_timeout_s: int
     _closing_tasks: Dict[wtypes.SessionId, Future]
@@ -22,8 +22,8 @@ class SessionManager:
     def __contains__(self, item: wtypes.SessionId) -> bool:
         return item in self.sessions
 
-    def create_new(self) -> models.Session:
-        session = models.Session.new()
+    def create_new(self) -> wtypes.Session:
+        session = wtypes.Session.new()
         self.sessions[session.id] = session
 
         # TODO: prepare a timeout if session is never used
@@ -33,7 +33,8 @@ class SessionManager:
         self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId, action: models.PlayerAction
     ):
         # TODO: asyncio queue for in order processing?
-        self.sessions[session_id].act(player_id, action)
+        pass
+        # self.sessions[session_id].act(player_id, action)
 
     def add_player(self, session_id: wtypes.SessionId) -> wtypes.PlayerId:
         self._cancel_session_closing(session_id)
@@ -44,7 +45,7 @@ class SessionManager:
         if empty:
             self._mark_for_close(session_id)
 
-    def game_parameters(self, session_id: wtypes.SessionId) -> models.GameParameters:
+    def game_parameters(self, session_id: wtypes.SessionId) -> wtypes.GameParameters:
         return self.sessions[session_id].current_parameters
 
     def _mark_for_close(self, session_id: wtypes.SessionId):

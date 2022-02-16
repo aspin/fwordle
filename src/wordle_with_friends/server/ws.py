@@ -1,5 +1,4 @@
 import logging
-from typing import cast
 
 import aiohttp
 from aiohttp import web
@@ -33,7 +32,7 @@ class WsServer:
     async def handle_new(self, _request: web.Request) -> web.StreamResponse:
         session = self._manager.create_new()
         logger.debug("creating session %s", session.id)
-        return web.json_response(session, dumps=serializer.dumps)
+        return web.json_response(models.Session.from_impl(session), dumps=serializer.dumps)
 
     async def handle_session(self, request: web.Request) -> web.StreamResponse:
         # player must be added and session kept alive before returning control to event loop
