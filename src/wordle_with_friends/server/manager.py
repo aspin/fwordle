@@ -5,7 +5,7 @@ from typing import Dict
 
 from aiohttp import web
 
-from src.wordle_with_friends import models, wtypes
+from src.wordle_with_friends import wtypes, game
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class SessionManager:
         return item in self.sessions
 
     def create_new(self) -> wtypes.Session:
-        session = wtypes.Session.new()
+        session = wtypes.Session.new(game.Wordle())
         self.sessions[session.id] = session
 
         # TODO: prepare a timeout if session is never used

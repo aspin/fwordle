@@ -6,27 +6,33 @@ from typing import List, Tuple
 from aiohttp import web
 
 from src.wordle_with_friends import serializer
-from src.wordle_with_friends.wtypes.common import PlayerId, SessionId
+from src.wordle_with_friends.wtypes.common import PlayerId, SessionId, ALL_PLAYER_ID
 from src.wordle_with_friends.wtypes.game_parameters import GameParameters
 from src.wordle_with_friends.wtypes.player import Player
-from src.wordle_with_friends.wtypes.events import PlayerAction, GameEvent
+from src.wordle_with_friends.wtypes.game import PlayerAction, GameEvent, Game
 
 
 class Session:
     id: SessionId
     players: List[Player]
     current_parameters: GameParameters
+    game: Game
 
-    _task: Future
+    _action_task: Future
     _action_queue: "asyncio.Queue[Tuple[PlayerId, PlayerAction]]"
 
-    def __init__(self, session_id: SessionId):
+    _event_task: Future
+
+    def __init__(self, session_id: SessionId, game: Game):
         self.id = session_id
         self.players = []
+        self.game = game
         self.current_parameters = GameParameters.default()
 
-        self._task = asyncio.create_task(self._process_actions())
+        self._action_task = asyncio.create_task(self._process_actions())
         self._action_queue = asyncio.Queue()
+
+        self._event_task = asyncio.create_task(self._process_events())
 
     def add_player(self, ws: web.WebSocketResponse) -> PlayerId:
         player = Player.new(ws)
@@ -46,21 +52,31 @@ class Session:
     async def queue_action(self, player_id: PlayerId, action: PlayerAction):
         await self._action_queue.put((player_id, action))
 
-    async def broadcast(self, event: GameEvent):
+    async def broadcast(self, player_ids: List[PlayerId], event: GameEvent):
+        broadcast_all = len(player_ids) == 1 and player_ids[0] == ALL_PLAYER_ID
         tasks = []
         for player in self.players:
-            tasks.append(asyncio.create_task(player.ws.send_json(event, dumps=serializer.dumps)))
+            if broadcast_all or player.id in player_ids:
+                tasks.append(
+                    asyncio.create_task(player.ws.send_json(event, dumps=serializer.dumps))
+                )
 
         await asyncio.wait(tasks)
 
     def close(self):
-        self._task.cancel()
+        self._action_task.cancel()
+        self._event_task.cancel()
 
     async def _process_actions(self):
         while True:
             player_id, action = await self._action_queue.get()
-            await self.broadcast(GameEvent("player_took_action", action.action))
+            self.game.process_action(player_id, action)
+
+    async def _process_events(self):
+        while True:
+            broadcast = await self.game.event_queue().get()
+            await self.broadcast(broadcast.players, broadcast.event)
 
     @classmethod
-    def new(cls) -> "Session":
-        return Session(SessionId(uuid.uuid4()))
+    def new(cls, game: Game) -> "Session":
+        return Session(SessionId(uuid.uuid4()), game)

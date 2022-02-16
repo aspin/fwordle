@@ -11,4 +11,4 @@ class Session(serializer.Simple):
 
     @classmethod
     def from_impl(cls, session: wtypes.Session) -> "Session":
-        return Session(session.id, session.players)
+        return Session(session.id, [player.id for player in session.players])
