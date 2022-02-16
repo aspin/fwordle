@@ -1,13 +1,16 @@
 import uuid
 from typing import List, Dict, Any
 
+from aiohttp import web
+
+from src.wordle_with_friends.wtypes.player import Player
 from src.wordle_with_friends.wtypes.game_parameters import GameParameters
 from src.wordle_with_friends.wtypes.common import PlayerId, SessionId
 
 
 class Session:
     id: SessionId
-    players: List[PlayerId]
+    players: List[Player]
     current_parameters: GameParameters
 
     def __init__(self, session_id: SessionId):
@@ -15,10 +18,10 @@ class Session:
         self.players = []
         self.current_parameters = GameParameters.default()
 
-    def add_player(self) -> PlayerId:
-        player_id = PlayerId(uuid.uuid4())
-        self.players.append(player_id)
-        return player_id
+    def add_player(self, ws: web.WebSocketResponse) -> PlayerId:
+        player = Player.new(ws)
+        self.players.append(player)
+        return player.id
 
     def remove_player(self, player_id: PlayerId) -> bool:
         """
@@ -27,7 +30,7 @@ class Session:
         :param player_id: player to remove
         :return: if session is now empty
         """
-        self.players.remove(player_id)
+        self.players = [player for player in self.players if player.id != player_id]
         return len(self.players) == 0
 
     def to_json(self) -> Dict[str, Any]:

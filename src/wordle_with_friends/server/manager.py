@@ -3,6 +3,8 @@ import logging
 from asyncio import Future
 from typing import Dict
 
+from aiohttp import web
+
 from src.wordle_with_friends import models, wtypes
 
 logger = logging.getLogger(__name__)
@@ -36,9 +38,9 @@ class SessionManager:
         pass
         # self.sessions[session_id].act(player_id, action)
 
-    def add_player(self, session_id: wtypes.SessionId) -> wtypes.PlayerId:
+    def add_player(self, session_id: wtypes.SessionId, ws: web.WebSocketResponse) -> wtypes.PlayerId:
         self._cancel_session_closing(session_id)
-        return self.sessions[session_id].add_player()
+        return self.sessions[session_id].add_player(ws)
 
     def remove_player(self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId):
         empty = self.sessions[session_id].remove_player(player_id)

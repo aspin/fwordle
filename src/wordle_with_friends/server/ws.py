@@ -40,10 +40,11 @@ class WsServer:
         if session_id not in self._manager:
             raise web.HTTPNotFound()
 
+        ws = web.WebSocketResponse()
+
         player_id = self._manager.add_player(session_id)
         logger.debug("%s joined session %s", player_id, session_id)
 
-        ws = web.WebSocketResponse()
         await ws.prepare(request)
 
         await ws.send_json(self._manager.game_parameters(session_id), dumps=serializer.dumps)
