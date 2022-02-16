@@ -1,9 +1,13 @@
 import asyncio
 import enum
+import logging
 from typing import Any, Dict, Callable, List, cast
 
 from src.wordle_with_friends import wtypes
 from src.wordle_with_friends.wtypes import GameParameters
+
+
+logger = logging.getLogger(__name__)
 
 
 class WordleAction(enum.Enum):
@@ -56,7 +60,10 @@ class Wordle(wtypes.Game):
         return "raise"
 
     def _emit(self, event: WordleEvent, params: Any):
-        self._event_queue.put_nowait(wtypes.BroadcastEvent([wtypes.ALL_PLAYER_ID], wtypes.GameEvent(event.name, params)))
+        logger.debug("emitting event %s", event)
+        self._event_queue.put_nowait(
+            wtypes.BroadcastEvent([wtypes.ALL_PLAYER_ID], wtypes.GameEvent(event.name, params))
+        )
 
     def _handle_add(self, player: wtypes.PlayerId, params: Any):
         letter = cast(str, params)
@@ -76,10 +83,14 @@ class Wordle(wtypes.Game):
         self._emit(WordleEvent.LETTER_DELETED, "".join(self._current_guess))
 
     def _handle_submit(self, player: wtypes.PlayerId, params: Any):
-        if len(self._current_guess) != self.params.word_length or len(self._guesses) >= self.params.max_guesses:
+        if (
+            len(self._current_guess) != self.params.word_length
+            or len(self._guesses) >= self.params.max_guesses
+        ):
             return
 
         self._guesses.append("".join(self._current_guess))
         self._current_guess = []
-        self._emit(WordleEvent.GUESS_SUBMITTED, self._guesses)  # TODO: indicate info about which letters were right
-
+        self._emit(
+            WordleEvent.GUESS_SUBMITTED, self._guesses
+        )  # TODO: indicate info about which letters were right
