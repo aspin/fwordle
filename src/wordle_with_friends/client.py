@@ -9,7 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 async def main():
-    session_id = await create_session()
+    # session_id = await create_session()
+    session_id = "5ecf6f84-7482-422e-ba1a-4f37cdb66c29"
     logger.info("connecting to session %s...", session_id)
     await connect_session(session_id)
 

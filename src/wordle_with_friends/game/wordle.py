@@ -76,7 +76,7 @@ class Wordle(wtypes.Game):
         self._emit(WordleEvent.LETTER_DELETED, "".join(self._current_guess))
 
     def _handle_submit(self, player: wtypes.PlayerId, params: Any):
-        if len(self._current_guess) != self.params.word_length or len(self._guesses) >= self.params.max_attempts:
+        if len(self._current_guess) != self.params.word_length or len(self._guesses) >= self.params.max_guesses:
             return
 
         self._guesses.append("".join(self._current_guess))

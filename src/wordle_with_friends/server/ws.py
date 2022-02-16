@@ -8,6 +8,8 @@ from src.wordle_with_friends.server.manager import SessionManager
 
 logger = logging.getLogger(__name__)
 
+ALLOW_CORS = {"Access-Control-Allow-Origin": "*"}
+
 
 class WsServer:
     _app: web.Application
@@ -32,7 +34,10 @@ class WsServer:
     async def handle_new(self, _request: web.Request) -> web.StreamResponse:
         session = self._manager.create_new()
         logger.debug("creating session %s", session.id)
-        return web.json_response(models.Session.from_impl(session), dumps=serializer.dumps)
+
+        return web.json_response(
+            models.Session.from_impl(session), headers=ALLOW_CORS, dumps=serializer.dumps
+        )
 
     async def handle_session(self, request: web.Request) -> web.StreamResponse:
         # player must be added and session kept alive before returning control to event loop
@@ -46,7 +51,6 @@ class WsServer:
         logger.debug("%s joined session %s", player_id, session_id)
 
         await ws.prepare(request)
-
         await ws.send_json(self._manager.game_parameters(session_id), dumps=serializer.dumps)
 
         try:
