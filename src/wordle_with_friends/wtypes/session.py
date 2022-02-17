@@ -22,17 +22,19 @@ class Session:
     current_parameters: GameParameters
     game: Game
 
+    _encoder: serializer.Encoder
     _action_task: Future
     _action_queue: "asyncio.Queue[Tuple[PlayerId, PlayerAction]]"
 
     _event_task: Future
 
-    def __init__(self, session_id: SessionId, game: Game):
+    def __init__(self, session_id: SessionId, game: Game, encoder: serializer.Encoder):
         self.id = session_id
         self.players = []
         self.game = game
         self.current_parameters = GameParameters.default()
 
+        self._encoder = encoder
         self._action_task = asyncio.create_task(self._process_actions())
         self._action_queue = asyncio.Queue()
 
@@ -62,7 +64,7 @@ class Session:
         for player in self.players:
             if broadcast_all or player.id in player_ids:
                 tasks.append(
-                    asyncio.create_task(player.ws.send_json(event, dumps=serializer.dumps))
+                    asyncio.create_task(player.ws.send_json(event, dumps=self._encoder))
                 )
 
         await asyncio.wait(tasks)
@@ -87,5 +89,5 @@ class Session:
                 logger.error(e)
 
     @classmethod
-    def new(cls, game: Game) -> "Session":
-        return Session(SessionId(uuid.uuid4()), game)
+    def new(cls, game: Game, encoder: serializer.Encoder) -> "Session":
+        return Session(SessionId(uuid.uuid4()), game, encoder)

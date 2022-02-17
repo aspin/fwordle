@@ -4,6 +4,7 @@ import aiohttp
 from aiohttp import web
 
 from src.wordle_with_friends import serializer, config, models, wtypes
+from src.wordle_with_friends.serializer import Case
 from src.wordle_with_friends.server.manager import SessionManager
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ class WsServer:
     _app: web.Application
     _config: config.App
     _manager: SessionManager
+    _encoder: serializer.Encoder
 
     def __init__(self, app_config: config.App):
         self._config = app_config
@@ -27,16 +29,19 @@ class WsServer:
         )
 
         self._manager = SessionManager(app_config.empty_session_timeout_s)
+        self._encoder = serializer.encodes(app_config.case)
 
     def run(self):
         web.run_app(self._app, port=9000)
 
     async def handle_new(self, _request: web.Request) -> web.StreamResponse:
-        session = self._manager.create_new()
+        session = self._manager.create_new(self._encoder)
         logger.debug("creating session %s", session.id)
 
         return web.json_response(
-            models.Session.from_impl(session), headers=ALLOW_CORS, dumps=serializer.dumps
+            models.Session.from_impl(session),
+            headers=ALLOW_CORS,
+            dumps=self._encoder,
         )
 
     async def handle_session(self, request: web.Request) -> web.StreamResponse:
@@ -51,12 +56,12 @@ class WsServer:
         logger.debug("%s joined session %s", player_id, session_id)
 
         await ws.prepare(request)
-        await ws.send_json(self._manager.game_parameters(session_id), dumps=serializer.dumps)
+        await ws.send_json(self._manager.game_parameters(session_id), dumps=self._encoder)
 
         try:
             msg: aiohttp.WSMessage
             async for msg in ws:
-                action = serializer.decodes(wtypes.PlayerAction, msg.data)
+                action = serializer.decodes(wtypes.PlayerAction, msg.data, self._config.case)
                 await self._manager.queue_action(session_id, player_id, action)
         finally:
             logger.debug("%s has left session %s", player_id, session_id)

@@ -4,13 +4,14 @@ import logging
 import aiohttp
 
 from src.wordle_with_friends import serializer, models, config, wtypes
+from src.wordle_with_friends.serializer import Case
 
 logger = logging.getLogger(__name__)
 
 
 async def main():
-    # session_id = await create_session()
-    session_id = "5ecf6f84-7482-422e-ba1a-4f37cdb66c29"
+    session_id = await create_session()
+    # session_id = "5ecf6f84-7482-422e-ba1a-4f37cdb66c29"
     logger.info("connecting to session %s...", session_id)
     await connect_session(session_id)
 
@@ -33,7 +34,7 @@ async def connect_session(session_id: str):
     msg: aiohttp.WSMessage
     while True:
         logger.info("sending letter to server...")
-        await ws.send_json(wtypes.PlayerAction("ADD_LETTER", "a"), dumps=serializer.dumps)
+        await ws.send_json(wtypes.PlayerAction("ADD_LETTER", "a"), dumps=serializer.encodes(Case.CAMEL))
         msg = await ws.receive()
         logger.info("response from server: %s", msg.data)
         await asyncio.sleep(0.5)

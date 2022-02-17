@@ -1,9 +1,19 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Callable
+
+import humps
+
+from src.wordle_with_friends.serializer.case import Case
 
 
-def dumps(obj: Any) -> str:
-    return json.dumps(obj, cls=EnhancedJSONEncoder)
+def encodes(case: Case) -> Callable[[Any], str]:
+    def inner(obj: Any):
+        return json.dumps(obj, cls=EnhancedJSONEncoder, case=case)
+
+    return inner
+
+
+Encoder = Callable[[Any], str]
 
 
 class Simple:
@@ -23,9 +33,20 @@ class Custom:
 
 
 class EnhancedJSONEncoder(json.JSONEncoder):
+    _case_fn: Callable[[Any], Any]
+
+    def __init__(self, *, case: Case = Case.SNAKE, **kwargs):
+
+        if case == Case.SNAKE:
+            self._case_fn = humps.decamelize
+        else:
+            self._case_fn = humps.camelize
+
+        super().__init__(**kwargs)
+
     def default(self, o: Any) -> Any:
         if isinstance(o, Simple):
-            return o.__dict__
+            return self._case_fn(o.__dict__)
         if isinstance(o, Custom):
-            return o.to_json()
+            return self._case_fn(o.to_json())
         return super().default(o)

@@ -5,7 +5,7 @@ from typing import Dict
 
 from aiohttp import web
 
-from src.wordle_with_friends import wtypes, game
+from src.wordle_with_friends import wtypes, game, serializer
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +24,8 @@ class SessionManager:
     def __contains__(self, item: wtypes.SessionId) -> bool:
         return item in self.sessions
 
-    def create_new(self) -> wtypes.Session:
-        session = wtypes.Session.new(game.Wordle())
+    def create_new(self, encoder: serializer.Encoder) -> wtypes.Session:
+        session = wtypes.Session.new(game.Wordle(), encoder)
         self.sessions[session.id] = session
 
         # TODO: prepare a timeout if session is never used
