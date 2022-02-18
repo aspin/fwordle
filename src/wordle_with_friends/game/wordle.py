@@ -4,8 +4,7 @@ import logging
 from typing import Any, Dict, Callable, List, cast
 
 from src.wordle_with_friends import wtypes
-from src.wordle_with_friends.wtypes import GameParameters
-
+from src.wordle_with_friends.wtypes import GameParameters, PlayerId
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,9 @@ class WordleAction(enum.Enum):
 class WordleEvent(enum.Enum):
     LETTER_ADDED = enum.auto()
     LETTER_DELETED = enum.auto()
-    GUESS_SUBMITTED = enum.auto()
+    SUBMISSION_NOT_A_WORD = enum.auto()
+    SUBMISSION_RESULT = enum.auto()
+    PLAYER_JOINED = enum.auto()
 
 
 class Wordle(wtypes.Game):
@@ -31,11 +32,13 @@ class Wordle(wtypes.Game):
 
     _action_map: Dict[WordleAction, Callable[[wtypes.PlayerId, Any], None]]
     _event_queue: "asyncio.Queue[wtypes.BroadcastEvent]"
+    _players: List[PlayerId]
 
     def __init__(self):
         self._current_guess = []
         self._guesses = []
         self._event_queue = asyncio.Queue()
+        self._players = []
 
         self.set_parameters(wtypes.GameParameters.default())
         self._action_map = {
@@ -43,6 +46,12 @@ class Wordle(wtypes.Game):
             WordleAction.DELETE_LETTER: self._handle_delete,
             WordleAction.SUBMIT_GUESS: self._handle_submit,
         }
+
+    def on_player_added(self, player_id: PlayerId):
+        self._players.append(player_id)
+
+        self._emit(player_id, WordleEvent.LETTER_ADDED, "".join(self._current_guess))
+        self._emit_all(WordleEvent.PLAYER_JOINED, self._players)
 
     def set_parameters(self, game_parameters: GameParameters):
         self.params = game_parameters
@@ -59,7 +68,13 @@ class Wordle(wtypes.Game):
     def _generate_word(self) -> str:
         return "raise"
 
-    def _emit(self, event: WordleEvent, params: Any):
+    def _emit(self, player_id: PlayerId, event: WordleEvent, params: Any):
+        logger.debug("emitting event %s to player %s", event, player_id)
+        self._event_queue.put_nowait(
+            wtypes.BroadcastEvent([player_id], wtypes.GameEvent(event.name, params),)
+        )
+
+    def _emit_all(self, event: WordleEvent, params: Any):
         logger.debug("emitting event %s", event)
         self._event_queue.put_nowait(
             wtypes.BroadcastEvent([wtypes.ALL_PLAYER_ID], wtypes.GameEvent(event.name, params))
@@ -68,19 +83,23 @@ class Wordle(wtypes.Game):
     def _handle_add(self, player: wtypes.PlayerId, params: Any):
         letter = cast(str, params)
 
-        # validate current game state TODO: decide if should be ignored?
-        if len(letter) > 1 or len(self._current_guess) >= self.params.word_length:
+        # validate input + current game state
+        if (
+            len(letter) > 1
+            or len(self._current_guess) >= self.params.word_length
+            or not letter.isalpha()
+        ):
             return
 
         self._current_guess.append(letter)
-        self._emit(WordleEvent.LETTER_ADDED, "".join(self._current_guess))
+        self._emit_all(WordleEvent.LETTER_ADDED, "".join(self._current_guess))
 
     def _handle_delete(self, player: wtypes.PlayerId, params: Any):
         if len(self._current_guess) <= 0:
             return
 
         self._current_guess.pop()
-        self._emit(WordleEvent.LETTER_DELETED, "".join(self._current_guess))
+        self._emit_all(WordleEvent.LETTER_DELETED, "".join(self._current_guess))
 
     def _handle_submit(self, player: wtypes.PlayerId, params: Any):
         if (
@@ -91,6 +110,6 @@ class Wordle(wtypes.Game):
 
         self._guesses.append("".join(self._current_guess))
         self._current_guess = []
-        self._emit(
-            WordleEvent.GUESS_SUBMITTED, self._guesses
+        self._emit_all(
+            WordleEvent.SUBMISSION_RESULT, self._guesses
         )  # TODO: indicate info about which letters were right

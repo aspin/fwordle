@@ -26,6 +26,11 @@ class BroadcastEvent(NamedTuple):
 
 
 class Game(ABC):
+
+    @abstractmethod
+    def on_player_added(self, player_id: PlayerId):
+        pass
+
     @abstractmethod
     def set_parameters(self, game_parameters: GameParameters):
         pass
