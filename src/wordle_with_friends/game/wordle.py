@@ -108,8 +108,9 @@ class Wordle(wtypes.Game):
         ):
             return
 
-        self._guesses.append("".join(self._current_guess))
+        last_guess = "".join(self._current_guess)
+        self._guesses.append(last_guess)
         self._current_guess = []
         self._emit_all(
-            WordleEvent.SUBMISSION_RESULT, self._guesses
+            WordleEvent.SUBMISSION_RESULT, last_guess
         )  # TODO: indicate info about which letters were right
