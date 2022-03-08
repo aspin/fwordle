@@ -31,7 +31,7 @@ class WsServer:
         self._encoder = serializer.encodes(app_config.case)
 
     def run(self):
-        web.run_app(self._app, port=9000)
+        web.run_app(self._app, port=9000, print=lambda _: None)
 
     async def handle_new(self, _request: web.Request) -> web.StreamResponse:
         session = self._manager.create_new(self._encoder)

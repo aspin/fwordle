@@ -1,12 +1,11 @@
 import asyncio
 import enum
 import logging
-from typing import Any, Dict, Callable, List, cast
+from typing import Any, Dict, Callable, List, cast, MutableMapping, Tuple, Optional, Mapping
 
 from src.wordle_with_friends import wtypes
-from src.wordle_with_friends.wtypes import GameParameters, PlayerId
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class WordleAction(enum.Enum):
@@ -27,18 +26,46 @@ class Wordle(wtypes.Game):
     params: wtypes.GameParameters
     chosen_word: str
 
+    _session_id: wtypes.SessionId
     _current_guess: List[str]
     _guesses: List[str]
 
     _action_map: Dict[WordleAction, Callable[[wtypes.PlayerId, Any], None]]
     _event_queue: "asyncio.Queue[wtypes.BroadcastEvent]"
-    _players: List[PlayerId]
+    _players: List[wtypes.PlayerId]
 
-    def __init__(self):
+    class _LogAdapter(logging.LoggerAdapter):
+        _wordle: "Wordle"
+
+        def __init__(
+            self, wordle: "Wordle", logger: logging.Logger,
+            extra: Optional[Mapping[str, object]] = None
+        ):
+            if extra is None:
+                extra = {}
+            super().__init__(logger, extra)
+            self._wordle = wordle
+
+        def process(
+            self, msg: Any, kwargs: MutableMapping[str, Any]
+        ) -> Tuple[Any, MutableMapping[str, Any]]:
+            return f"[S:{self._wordle._session_id}]{self.generate_debug()} {msg}", kwargs
+
+        def generate_debug(self) -> str:
+            if self.logger.isEnabledFor(logging.DEBUG):
+                last_guess = ""
+                if len(self._wordle._guesses) > 0:
+                    last_guess = self._wordle._guesses[-1]
+                return f"[word: {self._wordle.chosen_word}, last guess: {last_guess}]"
+            return ""
+
+    def __init__(self, session_id: str):
+        self._session_id = session_id
         self._current_guess = []
         self._guesses = []
         self._event_queue = asyncio.Queue()
         self._players = []
+        self._log = Wordle._LogAdapter(self, _logger)
 
         self.set_parameters(wtypes.GameParameters.default())
         self._action_map = {
@@ -47,13 +74,13 @@ class Wordle(wtypes.Game):
             WordleAction.SUBMIT_GUESS: self._handle_submit,
         }
 
-    def on_player_added(self, player_id: PlayerId):
+    def on_player_added(self, player_id: wtypes.PlayerId):
         self._players.append(player_id)
 
         self._emit(player_id, WordleEvent.LETTER_ADDED, "".join(self._current_guess))
         self._emit_all(WordleEvent.PLAYER_JOINED, self._players)
 
-    def set_parameters(self, game_parameters: GameParameters):
+    def set_parameters(self, game_parameters: wtypes.GameParameters):
         self.params = game_parameters
         self.chosen_word = self._generate_word()
 
@@ -68,14 +95,14 @@ class Wordle(wtypes.Game):
     def _generate_word(self) -> str:
         return "raise"
 
-    def _emit(self, player_id: PlayerId, event: WordleEvent, params: Any):
-        logger.debug("emitting event %s to player %s", event, player_id)
+    def _emit(self, player_id: wtypes.PlayerId, event: WordleEvent, params: Any):
+        self._log.debug("emitting event %s to player %s", event, player_id)
         self._event_queue.put_nowait(
             wtypes.BroadcastEvent([player_id], wtypes.GameEvent(event.name, params),)
         )
 
     def _emit_all(self, event: WordleEvent, params: Any):
-        logger.debug("emitting event %s", event)
+        self._log.debug("emitting event %s", event)
         self._event_queue.put_nowait(
             wtypes.BroadcastEvent([wtypes.ALL_PLAYER_ID], wtypes.GameEvent(event.name, params))
         )

@@ -2,18 +2,34 @@ import asyncio
 import logging
 import uuid
 from asyncio import Future
-from typing import List, Tuple
+from typing import List, Tuple, Mapping, Any, MutableMapping, Optional
 
 from aiohttp import web
 
 from src.wordle_with_friends import serializer
 from src.wordle_with_friends.wtypes.common import PlayerId, SessionId, ALL_PLAYER_ID
+from src.wordle_with_friends.wtypes.game import PlayerAction, GameEvent, Game
 from src.wordle_with_friends.wtypes.game_parameters import GameParameters
 from src.wordle_with_friends.wtypes.player import Player
-from src.wordle_with_friends.wtypes.game import PlayerAction, GameEvent, Game
+
+_logger = logging.getLogger(__name__)
 
 
-logger = logging.getLogger(__name__)
+class SessionLogAdapter(logging.LoggerAdapter):
+    _session_id: SessionId
+
+    def __init__(
+        self, session_id: SessionId, logger: logging.Logger, extra: Optional[Mapping[str, object]] = None
+    ):
+        if extra is None:
+            extra = {}
+        super().__init__(logger, extra)
+        self._session_id = session_id
+
+    def process(
+        self, msg: Any, kwargs: MutableMapping[str, Any]
+    ) -> Tuple[Any, MutableMapping[str, Any]]:
+        return f"[S:{self._session_id}] {msg}", kwargs
 
 
 class Session:
@@ -27,6 +43,7 @@ class Session:
     _action_queue: "asyncio.Queue[Tuple[PlayerId, PlayerAction]]"
 
     _event_task: Future
+    _log: logging.LoggerAdapter
 
     def __init__(self, session_id: SessionId, game: Game, encoder: serializer.Encoder):
         self.id = session_id
@@ -39,6 +56,7 @@ class Session:
         self._action_queue = asyncio.Queue()
 
         self._event_task = asyncio.create_task(self._process_events())
+        self._log = SessionLogAdapter(session_id, _logger)
 
     def add_player(self, ws: web.WebSocketResponse) -> PlayerId:
         player = Player.new(ws)
@@ -64,9 +82,7 @@ class Session:
         tasks = []
         for player in self.players:
             if broadcast_all or player.id in player_ids:
-                tasks.append(
-                    asyncio.create_task(player.ws.send_json(event, dumps=self._encoder))
-                )
+                tasks.append(asyncio.create_task(player.ws.send_json(event, dumps=self._encoder)))
 
         await asyncio.wait(tasks)
 
@@ -77,18 +93,18 @@ class Session:
     async def _process_actions(self):
         while True:
             player_id, action = await self._action_queue.get()
-            logger.debug("[S:%s][P:%s] processing action: %s", self.id, player_id, action)
+            self._log.debug("processing player action: %s => %s", player_id, action)
             self.game.process_action(player_id, action)
 
     async def _process_events(self):
         while True:
             try:
                 broadcast = await self.game.event_queue().get()
-                logger.debug("[S:%s] processing broadcast: %s", self.id, broadcast)
+                self._log.debug("process broadcast: %s", broadcast)
                 await self.broadcast(broadcast.players, broadcast.event)
             except Exception as e:
-                logger.error(e)
+                self._log.error(e)
 
     @classmethod
-    def new(cls, game: Game, encoder: serializer.Encoder) -> "Session":
-        return Session(SessionId(uuid.uuid4()), game, encoder)
+    def generate_id(cls) -> SessionId:
+        return SessionId(uuid.uuid4())

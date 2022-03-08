@@ -25,7 +25,8 @@ class SessionManager:
         return item in self.sessions
 
     def create_new(self, encoder: serializer.Encoder) -> wtypes.Session:
-        session = wtypes.Session.new(game.Wordle(), encoder)
+        session_id = wtypes.Session.generate_id()
+        session = wtypes.Session(session_id, game.Wordle(session_id), encoder)
         self.sessions[session.id] = session
 
         # prepare to timeout session if no one joins in 10x the usual interval
