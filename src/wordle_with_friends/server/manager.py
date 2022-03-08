@@ -28,7 +28,9 @@ class SessionManager:
         session = wtypes.Session.new(game.Wordle(), encoder)
         self.sessions[session.id] = session
 
-        # TODO: prepare a timeout if session is never used
+        # prepare to timeout session if no one joins in 10x the usual interval
+        self._mark_for_close(session.id, 10 * self._closing_timeout_s)
+
         return session
 
     async def queue_action(
@@ -45,12 +47,17 @@ class SessionManager:
     def remove_player(self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId):
         empty = self.sessions[session_id].remove_player(player_id)
         if empty:
-            self._mark_for_close(session_id)
+            logger.debug(
+                "session %s is now empty: will close in %s seconds if no further activity",
+                session_id,
+                self._closing_timeout_s,
+            )
+            self._mark_for_close(session_id, self._closing_timeout_s)
 
     def game_parameters(self, session_id: wtypes.SessionId) -> wtypes.GameParameters:
         return self.sessions[session_id].current_parameters
 
-    def _mark_for_close(self, session_id: wtypes.SessionId):
+    def _mark_for_close(self, session_id: wtypes.SessionId, timeout: int):
         """
         Prepares to close the session if no activity during the timeout.
 
@@ -59,14 +66,9 @@ class SessionManager:
 
         :param session_id: session to close
         """
-        logger.debug(
-            "session %s is now empty: will close in %s seconds if no further activity",
-            session_id,
-            self._closing_timeout_s,
-        )
         self._cancel_session_closing(session_id)
         self._closing_tasks[session_id] = asyncio.create_task(
-            self._wait_and_close(session_id, self._closing_timeout_s)
+            self._wait_and_close(session_id, timeout)
         )
 
     def _cancel_session_closing(self, session_id: wtypes.SessionId):
@@ -76,5 +78,5 @@ class SessionManager:
 
     async def _wait_and_close(self, session_id: wtypes.SessionId, timeout: int):
         await asyncio.sleep(timeout)
-        logger.debug("session %s is now closed", session_id)
+        logger.info("session %s is now closed", session_id)
         self.sessions.pop(session_id, None)

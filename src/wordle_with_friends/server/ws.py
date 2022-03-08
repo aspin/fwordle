@@ -4,7 +4,6 @@ import aiohttp
 from aiohttp import web
 
 from src.wordle_with_friends import serializer, config, models, wtypes
-from src.wordle_with_friends.serializer import Case
 from src.wordle_with_friends.server.manager import SessionManager
 
 logger = logging.getLogger(__name__)
