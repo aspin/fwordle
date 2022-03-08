@@ -1,25 +1,12 @@
 import asyncio
-import enum
 import logging
 from typing import Any, Dict, Callable, List, cast, MutableMapping, Tuple, Optional, Mapping
 
 from src.wordle_with_friends import wtypes
+from src.wordle_with_friends.game.wordle_events import WordleAction, WordleEvent
+from src.wordle_with_friends.game.wordle_guess import WordleGuess
 
 _logger = logging.getLogger(__name__)
-
-
-class WordleAction(enum.Enum):
-    ADD_LETTER = enum.auto()
-    DELETE_LETTER = enum.auto()
-    SUBMIT_GUESS = enum.auto()
-
-
-class WordleEvent(enum.Enum):
-    LETTER_ADDED = enum.auto()
-    LETTER_DELETED = enum.auto()
-    SUBMISSION_NOT_A_WORD = enum.auto()
-    SUBMISSION_RESULT = enum.auto()
-    PLAYER_JOINED = enum.auto()
 
 
 class Wordle(wtypes.Game):
@@ -27,8 +14,8 @@ class Wordle(wtypes.Game):
     chosen_word: str
 
     _session_id: wtypes.SessionId
-    _current_guess: List[str]
-    _guesses: List[str]
+    _current_guess: WordleGuess
+    _guesses: List[WordleGuess]
 
     _action_map: Dict[WordleAction, Callable[[wtypes.PlayerId, Any], None]]
     _event_queue: "asyncio.Queue[wtypes.BroadcastEvent]"
@@ -38,8 +25,10 @@ class Wordle(wtypes.Game):
         _wordle: "Wordle"
 
         def __init__(
-            self, wordle: "Wordle", logger: logging.Logger,
-            extra: Optional[Mapping[str, object]] = None
+            self,
+            wordle: "Wordle",
+            logger: logging.Logger,
+            extra: Optional[Mapping[str, object]] = None,
         ):
             if extra is None:
                 extra = {}
@@ -61,7 +50,7 @@ class Wordle(wtypes.Game):
 
     def __init__(self, session_id: str):
         self._session_id = session_id
-        self._current_guess = []
+        self._current_guess = WordleGuess()
         self._guesses = []
         self._event_queue = asyncio.Queue()
         self._players = []
@@ -77,7 +66,7 @@ class Wordle(wtypes.Game):
     def on_player_added(self, player_id: wtypes.PlayerId):
         self._players.append(player_id)
 
-        self._emit(player_id, WordleEvent.LETTER_ADDED, "".join(self._current_guess))
+        self._emit(player_id, WordleEvent.LETTER_ADDED, self._current_guess)
         self._emit_all(WordleEvent.PLAYER_JOINED, self._players)
 
     def set_parameters(self, game_parameters: wtypes.GameParameters):
@@ -118,15 +107,12 @@ class Wordle(wtypes.Game):
         ):
             return
 
-        self._current_guess.append(letter)
-        self._emit_all(WordleEvent.LETTER_ADDED, "".join(self._current_guess))
+        self._current_guess.append(letter, player)
+        self._emit_all(WordleEvent.LETTER_ADDED, self._current_guess)
 
     def _handle_delete(self, player: wtypes.PlayerId, params: Any):
-        if len(self._current_guess) <= 0:
-            return
-
         self._current_guess.pop()
-        self._emit_all(WordleEvent.LETTER_DELETED, "".join(self._current_guess))
+        self._emit_all(WordleEvent.LETTER_DELETED, self._current_guess)
 
     def _handle_submit(self, player: wtypes.PlayerId, params: Any):
         if (
@@ -135,9 +121,7 @@ class Wordle(wtypes.Game):
         ):
             return
 
-        last_guess = "".join(self._current_guess)
+        last_guess = self._current_guess
         self._guesses.append(last_guess)
-        self._current_guess = []
-        self._emit_all(
-            WordleEvent.SUBMISSION_RESULT, last_guess
-        )  # TODO: indicate info about which letters were right
+        self._current_guess = WordleGuess()
+        self._emit_all(WordleEvent.SUBMISSION_RESULT, last_guess)
