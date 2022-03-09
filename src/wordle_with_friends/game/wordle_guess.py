@@ -39,21 +39,35 @@ class WordleGuess(serializer.Simple):
         if len(self.letters) > 0:
             self.letters.pop()
 
-    def verify(self, expected: str):
+    def verify(self, expected: str) -> bool:
         if len(expected) != len(self.letters):
             raise ValueError("word was not same length as the guess")
 
+        # find all expected letters
         expected_letters = defaultdict(int)
         for letter in expected:
             expected_letters[letter] += 1
 
+        # clean up any previous verification
+        for lg in self.letters:
+            lg.state = WordleLetterState.UNKNOWN
+
+        # first pass: mark all correct letters
         for i, lg in enumerate(self.letters):
             if lg.letter == expected[i]:
                 lg.state = WordleLetterState.CORRECT
                 expected_letters[lg.letter] -= 1
-            elif expected_letters[lg.letter] > 0:
-                # TODO: there's an ordering problem! if partial identified before correct, then there's an issue
+
+        # second pass: mark all partial and incorrect letters if not already correct
+        for i, lg in enumerate(self.letters):
+            if lg.state == WordleLetterState.CORRECT:
+                continue
+
+            if expected_letters[lg.letter] > 0:
                 lg.state = WordleLetterState.PARTIAL
                 expected_letters[lg.letter] -= 1
             else:
                 lg.state = WordleLetterState.INCORRECT
+
+        return all(lg.state == WordleLetterState.CORRECT for lg in self.letters)
+
