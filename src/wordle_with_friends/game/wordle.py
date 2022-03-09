@@ -122,6 +122,7 @@ class Wordle(wtypes.Game):
             return
 
         last_guess = self._current_guess
+        last_guess.verify(self.chosen_word)
         self._guesses.append(last_guess)
         self._current_guess = WordleGuess()
         self._emit_all(WordleEvent.SUBMISSION_RESULT, last_guess)
