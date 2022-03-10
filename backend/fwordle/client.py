@@ -38,7 +38,8 @@ async def connect_session(session_id: str):
             wtypes.PlayerAction("ADD_LETTER", "a"), dumps=serializer.encodes(Case.CAMEL)
         )
         await ws.send_json(
-            wtypes.PlayerAction("SUBMIT_GUESS", "a"), dumps=serializer.encodes(Case.CAMEL)
+            wtypes.PlayerAction("SUBMIT_GUESS", "a"),
+            dumps=serializer.encodes(Case.CAMEL),
         )
         msg = await ws.receive()
         logger.info("response from server: %s", msg.data)

@@ -33,7 +33,7 @@ jobs:
         flake8 .  --count --show-source --statistics
     - name: Check format with black
       run: |
-        black --check
+        black --check --diff .
     - name: Test with pytest
       run: |
         pytest
