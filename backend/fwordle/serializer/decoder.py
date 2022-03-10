@@ -28,17 +28,18 @@ def decode(
     Loads a model class instance from the dictionary.
 
     This function ensures that models are forward compatible. If attributes are
-    added to the model in future versions, and those versions are serialized somewhere
-    else, this function ensures that only attributes that the current version of code
-    knows about are loaded.
+    added to the model in future versions, and those versions are serialized
+    somewhere else, this function ensures that only attributes that the current
+    version of code knows about are loaded.
 
-    It's best not to dive too deeply into this class, as it is not particularly sane.
+    It's best not to dive too deeply into this class, as it is not
+    particularly sane.
 
     :param model_class: class of the model to load into
     :param model_params: attributes from the retrieved model to load
     :param model_case: case of the attribute names from the retrieved model
-                       these attribute names will be converted to snake_case for lookup
-                       of type information
+                       these attribute names will be converted to snake_case
+                       for lookup of type information
     :return: instance of model class
     """
     try:
@@ -82,7 +83,8 @@ def _load_attribute(
     Loads an attribute and attempts to cast it to the correct class type.
 
     For dataclasses, recurse and attempt to load the original model.
-    For Any types, None values, or Generic types, return the provided value as is.
+    For Any types, None values, or Generic types, return the provided value
+    as is.
     For builtin `typing` types, special handling is generally required.
         List/Dict/... have been implemented for now.
     For Flag enum types, use the Flag name for loading / writing.
