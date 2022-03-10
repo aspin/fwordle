@@ -2,7 +2,7 @@ import uuid
 
 from aiohttp import web
 
-from src.wordle_with_friends.wtypes.common import PlayerId
+from fwordle.wtypes.common import PlayerId
 
 
 class Player:

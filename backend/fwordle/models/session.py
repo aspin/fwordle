@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.wordle_with_friends import serializer, wtypes
+from fwordle import serializer, wtypes
 
 
 @dataclass

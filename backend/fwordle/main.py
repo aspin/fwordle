@@ -1,4 +1,4 @@
-from src.wordle_with_friends import server, config
+from fwordle import server, config
 
 
 def main():

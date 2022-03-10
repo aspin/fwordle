@@ -5,8 +5,8 @@ from typing import Dict, Type, TypeVar, Any, List, Optional, Union, Set
 
 import humps
 
-from src.wordle_with_friends.serializer import encoder
-from src.wordle_with_friends.serializer.case import Case
+from fwordle.serializer import encoder
+from fwordle.serializer.case import Case
 
 T = TypeVar("T")
 _TYPE_HANDLER_MAPPING = {}

@@ -1,4 +1,4 @@
-# Wordle With Friends Frontend
+# fwordle Frontend
 Generated from https://github.com/vikpe/react-webpack-typescript-starter
 > Minimal starter with hot module replacement (HMR) for rapid development.
 

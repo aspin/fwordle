@@ -6,11 +6,11 @@ from typing import List, Tuple, Mapping, Any, MutableMapping, Optional
 
 from aiohttp import web
 
-from src.wordle_with_friends import serializer
-from src.wordle_with_friends.wtypes.common import PlayerId, SessionId, ALL_PLAYER_ID
-from src.wordle_with_friends.wtypes.game import PlayerAction, GameEvent, Game
-from src.wordle_with_friends.wtypes.game_parameters import GameParameters
-from src.wordle_with_friends.wtypes.player import Player
+from fwordle import serializer
+from fwordle.wtypes.common import PlayerId, SessionId, ALL_PLAYER_ID
+from fwordle.wtypes.game import PlayerAction, GameEvent, Game
+from fwordle.wtypes.game_parameters import GameParameters
+from fwordle.wtypes.player import Player
 
 _logger = logging.getLogger(__name__)
 

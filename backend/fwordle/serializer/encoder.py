@@ -4,7 +4,7 @@ from typing import Any, Dict, Callable
 
 import humps
 
-from src.wordle_with_friends.serializer.case import Case
+from fwordle.serializer.case import Case
 
 
 def encodes(case: Case) -> Callable[[Any], str]:

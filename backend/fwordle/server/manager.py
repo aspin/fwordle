@@ -5,7 +5,7 @@ from typing import Dict
 
 from aiohttp import web
 
-from src.wordle_with_friends import wtypes, game, serializer
+from fwordle import wtypes, game, serializer
 
 logger = logging.getLogger(__name__)
 

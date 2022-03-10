@@ -12,6 +12,6 @@ class WordleEvent(enum.Enum):
     LETTER_DELETED = enum.auto()
     SUBMISSION_NOT_A_WORD = enum.auto()
     SUBMISSION_RESULT = enum.auto()
-    PLAYER_JOINED = enum.auto()
+    PLAYER_CHANGED = enum.auto()
 
 

@@ -3,8 +3,8 @@ import logging
 
 import aiohttp
 
-from src.wordle_with_friends import serializer, models, config, wtypes
-from src.wordle_with_friends.serializer import Case
+from fwordle import serializer, models, config, wtypes
+from fwordle.serializer import Case
 
 logger = logging.getLogger(__name__)
 

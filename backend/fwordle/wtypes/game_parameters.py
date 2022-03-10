@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.wordle_with_friends import serializer
+from fwordle import serializer
 
 
 @dataclass

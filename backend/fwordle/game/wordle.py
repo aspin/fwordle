@@ -2,9 +2,9 @@ import asyncio
 import logging
 from typing import Any, Dict, Callable, List, cast, MutableMapping, Tuple, Optional, Mapping
 
-from src.wordle_with_friends import wtypes
-from src.wordle_with_friends.game.wordle_events import WordleAction, WordleEvent
-from src.wordle_with_friends.game.wordle_guess import WordleGuess
+from fwordle import wtypes
+from fwordle.game.wordle_events import WordleAction, WordleEvent
+from fwordle.game.wordle_guess import WordleGuess
 
 _logger = logging.getLogger(__name__)
 
@@ -67,7 +67,11 @@ class Wordle(wtypes.Game):
         self._players.append(player_id)
 
         self._emit(player_id, WordleEvent.LETTER_ADDED, self._current_guess)
-        self._emit_all(WordleEvent.PLAYER_JOINED, self._players)
+        self._emit_all(WordleEvent.PLAYER_CHANGED, self._players)
+
+    def on_player_removed(self, removed_player_id: wtypes.PlayerId):
+        self._players = [player_id for player_id in self._players if player_id != removed_player_id]
+        self._emit_all(WordleEvent.PLAYER_CHANGED, self._players)
 
     def set_parameters(self, game_parameters: wtypes.GameParameters):
         self.params = game_parameters

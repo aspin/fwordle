@@ -1,4 +1,4 @@
-from src.wordle_with_friends.serializer import Case
+from fwordle.serializer import Case
 
 
 class App:

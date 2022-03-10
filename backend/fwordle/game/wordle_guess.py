@@ -3,7 +3,7 @@ import enum
 from collections import defaultdict
 from typing import List
 
-from src.wordle_with_friends import wtypes, serializer
+from fwordle import wtypes, serializer
 
 
 class WordleLetterState(enum.IntEnum):

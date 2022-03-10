@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from src.wordle_with_friends.game.wordle_guess import WordleGuess, WordleLetterState
+from fwordle.game.wordle_guess import WordleGuess, WordleLetterState
 
 
 @pytest.fixture

@@ -3,8 +3,8 @@ import logging
 import aiohttp
 from aiohttp import web
 
-from src.wordle_with_friends import serializer, config, models, wtypes
-from src.wordle_with_friends.server.manager import SessionManager
+from fwordle import serializer, config, models, wtypes
+from fwordle.server.manager import SessionManager
 
 logger = logging.getLogger(__name__)
 

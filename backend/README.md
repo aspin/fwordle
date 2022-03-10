@@ -1,1 +1,1 @@
-# wordle-with-friends
+# fwordle-backend
