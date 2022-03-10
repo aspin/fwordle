@@ -12,12 +12,18 @@ T = TypeVar("T")
 _TYPE_HANDLER_MAPPING = {}
 
 
-def decodes(model_class: Type[T], model_params: str, model_case: Case = Case.SNAKE) -> T:
+def decodes(
+    model_class: Type[T], model_params: str, model_case: Case = Case.SNAKE
+) -> T:
     model_dict = json.loads(model_params)
     return decode(model_class, model_dict, model_case)
 
 
-def decode(model_class: Type[T], model_params: Dict[str, Any], model_case: Case = Case.SNAKE) -> T:
+def decode(
+    model_class: Type[T],
+    model_params: Dict[str, Any],
+    model_case: Case = Case.SNAKE,
+) -> T:
     """
     Loads a model class instance from the dictionary.
 
@@ -41,7 +47,10 @@ def decode(model_class: Type[T], model_params: Dict[str, Any], model_case: Case 
 
         attributes = {}
         if dataclasses.is_dataclass(model_class):
-            fields = {attribute.name: attribute.type for attribute in dataclasses.fields(model_class)}
+            fields = {
+                attribute.name: attribute.type
+                for attribute in dataclasses.fields(model_class)
+            }
         else:
             fields = model_class.__annotations__
 
@@ -52,7 +61,9 @@ def decode(model_class: Type[T], model_params: Dict[str, Any], model_case: Case 
                 model_attribute_name = humps.camelize(attribute_name)
             if model_attribute_name in model_params:
                 attributes[attribute_name] = _load_attribute(
-                    attribute_type, model_params[model_attribute_name], model_case=model_case
+                    attribute_type,
+                    model_params[model_attribute_name],
+                    model_case=model_case,
                 )
         return model_class(**attributes)
     except Exception as e:
@@ -84,7 +95,11 @@ def _load_attribute(
     """
     if hasattr(attribute_type, "__annotations__"):
         return decode(attribute_type, attribute_value, model_case)
-    elif attribute_type == Any or attribute_value is None or attribute_type.__class__ == TypeVar:
+    elif (
+        attribute_type == Any
+        or attribute_value is None
+        or attribute_type.__class__ == TypeVar
+    ):
         return attribute_value
     elif hasattr(attribute_type, "__origin__"):
         if attribute_type.__origin__ in _TYPE_HANDLER_MAPPING:
@@ -102,7 +117,9 @@ def _load_attribute(
         if cast_basic_values:
             return attribute_type(attribute_value)
         elif not isinstance(attribute_value, attribute_type):
-            raise TypeError(f"{attribute_value} is not of type {attribute_type}.")
+            raise TypeError(
+                f"{attribute_value} is not of type {attribute_type}."
+            )
         else:
             return attribute_value
 
@@ -116,7 +133,8 @@ def _load_list(list_type: Type[T], list_value: Any, model_case: Case) -> List:
 
     list_param = list_type.__args__[0]
     return [
-        _load_attribute(list_param, list_entry, model_case=model_case) for list_entry in list_value
+        _load_attribute(list_param, list_entry, model_case=model_case)
+        for list_entry in list_value
     ]
 
 
@@ -128,12 +146,19 @@ def _load_set(set_type: Type[T], set_value: Any, model_case: Case) -> Set:
         raise ValueError("List type annotation requires 1 or 0 args.")
 
     set_param = set_type.__args__[0]
-    return {_load_attribute(set_param, set_entry, model_case=model_case) for set_entry in set_value}
+    return {
+        _load_attribute(set_param, set_entry, model_case=model_case)
+        for set_entry in set_value
+    }
 
 
 def _load_dict(dict_type: Type[T], dict_value: Any, model_case: Case) -> Dict:
     if not isinstance(dict_value, Dict):
-        raise TypeError("Cannot deserialize value {} to Dict type {}".format(dict_value, dict_type))
+        raise TypeError(
+            "Cannot deserialize value {} to Dict type {}".format(
+                dict_value, dict_type
+            )
+        )
 
     if len(dict_type.__args__) != 2:
         raise ValueError("Dict type annotation requires 2 or 0 args.")
@@ -148,26 +173,35 @@ def _load_dict(dict_type: Type[T], dict_value: Any, model_case: Case) -> Dict:
     }
 
 
-def _load_optional(optional_type: Type[T], optional_value: Any, model_case: Case) -> Optional:
+def _load_optional(
+    optional_type: Type[T], optional_value: Any, model_case: Case
+) -> Optional:
     if len(optional_type.__args__) != 1:
         raise ValueError("Optional types must have a type annotation.")
 
     optional_param = optional_type.__args__[0]
-    return _load_attribute(optional_param, optional_value, model_case=model_case)
+    return _load_attribute(
+        optional_param, optional_value, model_case=model_case
+    )
 
 
 def _load_union(union_type: Type[T], union_value: Any, model_case: Case) -> Any:
     if len(union_type.__args__) == 2 and type(None) in union_type.__args__:
         # special case of an optional
-        return _load_attribute(union_type.__args__[0], union_value, model_case=model_case)
+        return _load_attribute(
+            union_type.__args__[0], union_value, model_case=model_case
+        )
     else:
         for union_param in union_type.__args__:
             # noinspection PyBroadException
             try:
                 return _load_attribute(
-                    union_param, union_value, cast_basic_values=False, model_case=model_case
+                    union_param,
+                    union_value,
+                    cast_basic_values=False,
+                    model_case=model_case,
                 )
-            except Exception as _e:
+            except Exception:
                 continue
         raise NotImplementedError(
             f"Could not find a union type that matched value. "

@@ -35,7 +35,10 @@ class SessionManager:
         return session
 
     async def queue_action(
-        self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId, action: wtypes.PlayerAction
+        self,
+        session_id: wtypes.SessionId,
+        player_id: wtypes.PlayerId,
+        action: wtypes.PlayerAction,
     ):
         await self.sessions[session_id].queue_action(player_id, action)
 
@@ -45,7 +48,9 @@ class SessionManager:
         self._cancel_session_closing(session_id)
         return self.sessions[session_id].add_player(ws)
 
-    def remove_player(self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId):
+    def remove_player(
+        self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId
+    ):
         empty = self.sessions[session_id].remove_player(player_id)
         if empty:
             logger.debug(
@@ -55,7 +60,9 @@ class SessionManager:
             )
             self._mark_for_close(session_id, self._closing_timeout_s)
 
-    def game_parameters(self, session_id: wtypes.SessionId) -> wtypes.GameParameters:
+    def game_parameters(
+        self, session_id: wtypes.SessionId
+    ) -> wtypes.GameParameters:
         return self.sessions[session_id].current_parameters
 
     def _mark_for_close(self, session_id: wtypes.SessionId, timeout: int):

@@ -55,12 +55,16 @@ class WsServer:
         logger.debug("%s joined session %s", player_id, session_id)
 
         await ws.prepare(request)
-        await ws.send_json(self._manager.game_parameters(session_id), dumps=self._encoder)
+        await ws.send_json(
+            self._manager.game_parameters(session_id), dumps=self._encoder
+        )
 
         try:
             msg: aiohttp.WSMessage
             async for msg in ws:
-                action = serializer.decodes(wtypes.PlayerAction, msg.data, self._config.case)
+                action = serializer.decodes(
+                    wtypes.PlayerAction, msg.data, self._config.case
+                )
                 await self._manager.queue_action(session_id, player_id, action)
         finally:
             logger.debug("%s has left session %s", player_id, session_id)

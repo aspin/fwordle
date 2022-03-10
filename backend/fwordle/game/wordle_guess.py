@@ -39,7 +39,9 @@ class WordleGuess(serializer.Simple):
         return "".join(lg.letter for lg in self.letters)
 
     def append(self, letter: str, player_id: wtypes.PlayerId):
-        self.letters.append(WordleLetterGuess(letter, player_id, WordleLetterState.UNKNOWN))
+        self.letters.append(
+            WordleLetterGuess(letter, player_id, WordleLetterState.UNKNOWN)
+        )
 
     def pop(self):
         if len(self.letters) > 0:
@@ -76,4 +78,3 @@ class WordleGuess(serializer.Simple):
                 lg.state = WordleLetterState.INCORRECT
 
         return all(lg.state == WordleLetterState.CORRECT for lg in self.letters)
-
