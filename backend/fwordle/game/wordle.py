@@ -58,7 +58,10 @@ class Wordle(wtypes.Game):
                 last_guess = ""
                 if len(self._wordle._guesses) > 0:
                     last_guess = self._wordle._guesses[-1]
-                return f"[word: {self._wordle.chosen_word}, last guess: {last_guess}]"
+                return (
+                    f"[word: {self._wordle.chosen_word}, last guess:"
+                    f" {last_guess}]"
+                )
             return ""
 
     def __init__(self, session_id: str):

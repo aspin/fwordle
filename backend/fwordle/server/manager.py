@@ -54,7 +54,8 @@ class SessionManager:
         empty = self.sessions[session_id].remove_player(player_id)
         if empty:
             logger.debug(
-                "session %s is now empty: will close in %s seconds if no further activity",
+                "session %s is now empty: will close in %s seconds if no"
+                " further activity",
                 session_id,
                 self._closing_timeout_s,
             )

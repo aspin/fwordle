@@ -69,7 +69,8 @@ def decode(
         return model_class(**attributes)
     except Exception as e:
         raise TypeError(
-            f"Could not load model of type {model_class} from data: {model_params}"
+            f"Could not load model of type {model_class} from data:"
+            f" {model_params}"
         ) from e
 
 
@@ -110,7 +111,7 @@ def _load_attribute(
             )
         else:
             raise NotImplementedError(
-                f"Model loader is not capable of loading a "
+                "Model loader is not capable of loading a "
                 f"{attribute_type.__origin__} type. Please implement a handler."
             )
     elif issubclass(attribute_type, Flag):
@@ -206,7 +207,7 @@ def _load_union(union_type: Type[T], union_value: Any, model_case: Case) -> Any:
             except Exception:
                 continue
         raise NotImplementedError(
-            f"Could not find a union type that matched value. "
+            "Could not find a union type that matched value. "
             f"Types: {union_type.__args__}, Value: {union_value}"
         )
 
