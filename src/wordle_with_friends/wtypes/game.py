@@ -21,7 +21,7 @@ class GameEvent(serializer.Simple):
 
 
 class BroadcastEvent(NamedTuple):
-    players: List[PlayerId]  # empty for all
+    players: List[PlayerId]  # empty for "all" broadcast
     event: GameEvent
 
 

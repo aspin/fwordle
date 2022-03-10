@@ -32,6 +32,9 @@ class WordleGuess(serializer.Simple):
     def __repr__(self):
         return f"WordleGuess({self.join()})"
 
+    def __str__(self):
+        return repr(self)
+
     def join(self) -> str:
         return "".join(lg.letter for lg in self.letters)
 
