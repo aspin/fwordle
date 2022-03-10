@@ -9,5 +9,5 @@ __all__ = [
     "Case",
     "Simple",
     "Custom",
-    "Encoder"
+    "Encoder",
 ]
