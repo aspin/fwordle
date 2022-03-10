@@ -32,6 +32,10 @@ class Game(ABC):
         pass
 
     @abstractmethod
+    def on_player_removed(self, player_id: PlayerId):
+        pass
+
+    @abstractmethod
     def set_parameters(self, game_parameters: GameParameters):
         pass
 

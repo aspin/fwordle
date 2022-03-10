@@ -67,7 +67,11 @@ class Wordle(wtypes.Game):
         self._players.append(player_id)
 
         self._emit(player_id, WordleEvent.LETTER_ADDED, self._current_guess)
-        self._emit_all(WordleEvent.PLAYER_JOINED, self._players)
+        self._emit_all(WordleEvent.PLAYER_CHANGED, self._players)
+
+    def on_player_removed(self, removed_player_id: wtypes.PlayerId):
+        self._players = [player_id for player_id in self._players if player_id != removed_player_id]
+        self._emit_all(WordleEvent.PLAYER_CHANGED, self._players)
 
     def set_parameters(self, game_parameters: wtypes.GameParameters):
         self.params = game_parameters
@@ -87,7 +91,7 @@ class Wordle(wtypes.Game):
     def _emit(self, player_id: wtypes.PlayerId, event: WordleEvent, params: Any):
         self._log.debug("emitting event %s to player %s", event, player_id)
         self._event_queue.put_nowait(
-            wtypes.BroadcastEvent([player_id], wtypes.GameEvent(event.name, params),)
+            wtypes.BroadcastEvent([player_id], wtypes.GameEvent(event.name, params), )
         )
 
     def _emit_all(self, event: WordleEvent, params: Any):

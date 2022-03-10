@@ -72,6 +72,7 @@ class Session:
         :return: if session is now empty
         """
         self.players = [player for player in self.players if player.id != player_id]
+        self.game.on_player_removed(player_id)
         return len(self.players) == 0
 
     async def queue_action(self, player_id: PlayerId, action: PlayerAction):
