@@ -23,8 +23,8 @@ def decode(model_class: Type[T], model_params: Dict[str, Any], model_case: Case 
 
     This function ensures that models are forward compatible. If attributes are
     added to the model in future versions, and those versions are serialized somewhere
-    (e.g. Redis), this function ensures that only attributes that the current
-    version knows about are loaded.
+    else, this function ensures that only attributes that the current version of code
+    knows about are loaded.
 
     It's best not to dive too deeply into this class, as it is not particularly sane.
 
