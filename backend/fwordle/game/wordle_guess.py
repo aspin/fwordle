@@ -66,7 +66,8 @@ class WordleGuess(serializer.Simple):
                 lg.state = WordleLetterState.CORRECT
                 expected_letters[lg.letter] -= 1
 
-        # second pass: mark all partial and incorrect letters if not already correct
+        # second pass: mark all partial and incorrect letters if not
+        # already correct
         for i, lg in enumerate(self.letters):
             if lg.state == WordleLetterState.CORRECT:
                 continue

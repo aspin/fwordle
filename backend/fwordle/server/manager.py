@@ -70,8 +70,8 @@ class SessionManager:
         """
         Prepares to close the session if no activity during the timeout.
 
-        In the case that this ends up called multiple times, assume that the timeout should be
-        restarted.
+        In the case that this ends up called multiple times, assume that the
+        timeout should be restarted.
 
         :param session_id: session to close
         """

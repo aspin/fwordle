@@ -71,7 +71,8 @@ class Session:
 
     def remove_player(self, player_id: PlayerId) -> bool:
         """
-        Removes a player from the session, and indicates if session is empty and should be closed.
+        Removes a player from the session, and indicates if session is empty
+        and should be closed.
 
         :param player_id: player to remove
         :return: if session is now empty
