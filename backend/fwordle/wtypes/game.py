@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, NamedTuple, List
 
 from fwordle import serializer
-from fwordle.wtypes import Player
+from fwordle.wtypes.player import Player
 from fwordle.wtypes.common import PlayerId
 from fwordle.wtypes.game_parameters import GameParameters
 
