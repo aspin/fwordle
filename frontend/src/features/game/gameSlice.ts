@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  correctGuess,
   emptyLetterGuess,
   GameGuessLetters,
   GameGuessLetterState,
@@ -14,6 +15,8 @@ export interface GameSlice {
   previousGuesses: GameGuessLetters[];
   players: Player[];
   connected: boolean;
+  done: boolean;
+  victory: boolean;
 }
 
 export interface GameGuessAction {
@@ -30,6 +33,8 @@ const initialState: GameSlice = {
   previousGuesses: [],
   players: [],
   connected: false,
+  done: false,
+  victory: false,
 };
 
 export const gameSlice = createSlice({
@@ -58,6 +63,13 @@ export const gameSlice = createSlice({
     submitGuess: (state, action: PayloadAction<GameGuessLetters>) => {
       state.previousGuesses.push(action.payload);
       state.currentLetters = _.times(state.params.wordLength, emptyLetterGuess);
+
+      if (correctGuess(action.payload)) {
+        state.victory = true;
+        state.done = true;
+      } else if (state.previousGuesses.length == state.params.maxGuesses) {
+        state.done = true;
+      }
     },
     setBadGuess: (state, action: PayloadAction<number>) => {
       state.currentLetters.forEach(
