@@ -43,10 +43,13 @@ class SessionManager:
         await self.sessions[session_id].queue_action(player_id, action)
 
     def add_player(
-        self, session_id: wtypes.SessionId, ws: web.WebSocketResponse
+        self,
+        session_id: wtypes.SessionId,
+        username: str,
+        ws: web.WebSocketResponse,
     ) -> wtypes.PlayerId:
         self._cancel_session_closing(session_id)
-        return self.sessions[session_id].add_player(ws)
+        return self.sessions[session_id].add_player(username, ws)
 
     def remove_player(
         self, session_id: wtypes.SessionId, player_id: wtypes.PlayerId

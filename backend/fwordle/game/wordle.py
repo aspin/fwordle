@@ -12,7 +12,7 @@ from typing import (
     Mapping,
 )
 
-from fwordle import wtypes
+from fwordle import wtypes, models
 from fwordle.game.wordle_events import WordleAction, WordleEvent
 from fwordle.game.wordle_guess import WordleGuess
 
@@ -29,7 +29,7 @@ class Wordle(wtypes.Game):
 
     _action_map: Dict[WordleAction, Callable[[wtypes.PlayerId, Any], None]]
     _event_queue: "asyncio.Queue[wtypes.BroadcastEvent]"
-    _players: List[wtypes.PlayerId]
+    _players: List[models.Player]
 
     class _LogAdapter(logging.LoggerAdapter):
         _wordle: "Wordle"
@@ -79,17 +79,15 @@ class Wordle(wtypes.Game):
             WordleAction.SUBMIT_GUESS: self._handle_submit,
         }
 
-    def on_player_added(self, player_id: wtypes.PlayerId):
-        self._players.append(player_id)
+    def on_player_added(self, player_id: wtypes.PlayerId, username: str):
+        self._players.append(models.Player(player_id, username))
 
         self._emit(player_id, WordleEvent.LETTER_ADDED, self._current_guess)
         self._emit_all(WordleEvent.PLAYER_CHANGED, self._players)
 
     def on_player_removed(self, removed_player_id: wtypes.PlayerId):
         self._players = [
-            player_id
-            for player_id in self._players
-            if player_id != removed_player_id
+            player for player in self._players if player.id != removed_player_id
         ]
         self._emit_all(WordleEvent.PLAYER_CHANGED, self._players)
 
@@ -116,8 +114,7 @@ class Wordle(wtypes.Game):
         self._log.debug("emitting event %s to player %s", event, player_id)
         self._event_queue.put_nowait(
             wtypes.BroadcastEvent(
-                [player_id],
-                wtypes.GameEvent(event.name, params),
+                [player_id], wtypes.GameEvent(event.name, params),
             )
         )
 

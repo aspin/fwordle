@@ -31,7 +31,7 @@ export default function Selector() {
     setGenerate(false);
   }
 
-  function connectSession(selectedSessionId: string) {
+  function connectSession(selectedSessionId: string, username: string) {
     setReady(true);
     setGenerate(false);
     dispatch(setSessionId(selectedSessionId));

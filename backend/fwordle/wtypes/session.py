@@ -63,10 +63,10 @@ class Session:
         self._event_task = asyncio.create_task(self._process_events())
         self._log = SessionLogAdapter(session_id, _logger)
 
-    def add_player(self, ws: web.WebSocketResponse) -> PlayerId:
-        player = Player.new(ws)
+    def add_player(self, username: str, ws: web.WebSocketResponse) -> PlayerId:
+        player = Player.new(username, ws)
         self.players.append(player)
-        self.game.on_player_added(player.id)
+        self.game.on_player_added(player.id, username)
         return player.id
 
     def remove_player(self, player_id: PlayerId) -> bool:

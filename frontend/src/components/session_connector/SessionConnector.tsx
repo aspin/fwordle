@@ -3,7 +3,7 @@ import { ChangeEvent } from "react";
 import { Box, Button, Grid, Stack, TextField } from "@mui/material";
 
 interface SessionConnectorProps {
-  connect: (string) => void;
+  connect: (sessionId: string, username: string) => void;
   create: () => void;
   sessionId: string;
 }
@@ -11,7 +11,7 @@ interface SessionConnectorProps {
 export default function SessionConnector(props: SessionConnectorProps) {
   function connect(e: ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
-    props.connect(e.target["session-id"].value);
+    props.connect(e.target["session-id"].value, e.target["username"].value);
   }
 
   return (

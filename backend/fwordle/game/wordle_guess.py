@@ -1,6 +1,6 @@
-import dataclasses
 import enum
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import List
 
 from fwordle import wtypes, serializer
@@ -13,7 +13,7 @@ class WordleLetterState(enum.IntEnum):
     INCORRECT = enum.auto()
 
 
-@dataclasses.dataclass
+@dataclass
 class WordleLetterGuess(serializer.Simple):
     letter: str
     player_id: wtypes.PlayerId
