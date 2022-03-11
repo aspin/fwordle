@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 from typing import (
     Any,
     Dict,
@@ -12,7 +13,7 @@ from typing import (
     Mapping,
 )
 
-from fwordle import wtypes, models
+from fwordle import wtypes, models, language
 from fwordle.game.wordle_events import WordleAction, WordleEvent
 from fwordle.game.wordle_guess import WordleGuess
 
@@ -24,6 +25,7 @@ class Wordle(wtypes.Game):
     chosen_word: str
 
     _session_id: wtypes.SessionId
+    _dictionary: language.LengthDictionary
     _current_guess: WordleGuess
     _guesses: List[WordleGuess]
 
@@ -64,8 +66,9 @@ class Wordle(wtypes.Game):
                 )
             return ""
 
-    def __init__(self, session_id: str):
+    def __init__(self, session_id: str, dictionary: language.LengthDictionary):
         self._session_id = session_id
+        self._dictionary = dictionary
         self._current_guess = WordleGuess()
         self._guesses = []
         self._event_queue = asyncio.Queue()
@@ -93,7 +96,7 @@ class Wordle(wtypes.Game):
 
     def set_parameters(self, game_parameters: wtypes.GameParameters):
         self.params = game_parameters
-        self.chosen_word = self._generate_word()
+        self.chosen_word = self._dictionary.generate(self.params.word_length)
 
     def process_action(
         self, player: wtypes.PlayerId, player_action: wtypes.PlayerAction
@@ -104,9 +107,6 @@ class Wordle(wtypes.Game):
 
     def event_queue(self) -> "asyncio.Queue[wtypes.BroadcastEvent]":
         return self._event_queue
-
-    def _generate_word(self) -> str:
-        return "raise"
 
     def _emit(
         self, player_id: wtypes.PlayerId, event: WordleEvent, params: Any

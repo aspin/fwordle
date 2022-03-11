@@ -4,7 +4,7 @@ import aiohttp
 from aiohttp import web
 
 from fwordle import serializer, config, models, wtypes
-from fwordle.server.manager import SessionManager
+from fwordle.server.session import SessionManager
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,9 @@ class WsServer:
             ]
         )
 
-        self._manager = SessionManager(app_config.empty_session_timeout_s)
+        self._manager = SessionManager(
+            app_config.empty_session_timeout_s, app_config.dictionary_path
+        )
         self._encoder = serializer.encodes(app_config.case)
 
     def run(self):
