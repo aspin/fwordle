@@ -3,6 +3,7 @@ import {
   emptyLetterGuess,
   GameGuessLetters,
   GameParameters,
+  Player,
 } from "../../types/game";
 import * as _ from "lodash";
 
@@ -10,7 +11,7 @@ export interface GameSlice {
   params: GameParameters;
   currentLetters: GameGuessLetters;
   previousGuesses: GameGuessLetters[];
-  players: string[];
+  players: Player[];
   connected: boolean;
 }
 
@@ -50,7 +51,7 @@ export const gameSlice = createSlice({
         }
       }
     },
-    setPlayers: (state, action: PayloadAction<string[]>) => {
+    setPlayers: (state, action: PayloadAction<Player[]>) => {
       state.players = action.payload;
     },
     submitGuess: (state, action: PayloadAction<GameGuessLetters>) => {

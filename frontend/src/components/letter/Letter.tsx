@@ -6,6 +6,7 @@ import { GameGuessLetter, StateColorMapping } from "../../types/game";
 
 interface LetterProps {
   guess: GameGuessLetter;
+  username: string;
   enabled: boolean;
   focus: boolean;
   onChange: (str) => void;
@@ -21,7 +22,7 @@ export default function Letter(props: LetterProps) {
   let inputRef;
   const tf = (
     <TextField
-      label={props.guess.playerId}
+      label={props.username}
       value={props.guess.letter.toUpperCase()}
       disabled={!props.enabled}
       inputRef={(e) => (inputRef = e)}

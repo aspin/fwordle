@@ -6,7 +6,7 @@ import {
   setPlayers,
   submitGuess,
 } from "../features/game/gameSlice";
-import { GameGuess } from "../types/game";
+import {GameGuess, Player} from "../types/game";
 
 function handle(dispatch: AppDispatch, data: object) {
   // TODO: should really determine game params vs event better...
@@ -48,7 +48,7 @@ function handleEvent(dispatch: AppDispatch, data: GameEvent) {
       dispatch(setCurrentWord(guess.letters));
       break;
     case "PLAYER_CHANGED":
-      dispatch(setPlayers(data.params as string[]));
+      dispatch(setPlayers(data.params as Player[]));
       break;
     case "SUBMISSION_RESULT":
       dispatch(submitGuess((data.params as GameGuess).letters));

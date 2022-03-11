@@ -2,10 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface SelectorSlice {
   sessionId: string;
+  username: string;
 }
 
 const initialState: SelectorSlice = {
   sessionId: "",
+  username: "",
 };
 
 export const selectorSlice = createSlice({
@@ -15,9 +17,12 @@ export const selectorSlice = createSlice({
     setSessionId: (state, action: PayloadAction<string>) => {
       state.sessionId = action.payload;
     },
+    setUsername: (state, action: PayloadAction<string>) => {
+      state.username = action.payload;
+    },
   },
 });
 
-export const { setSessionId } = selectorSlice.actions;
+export const { setSessionId, setUsername } = selectorSlice.actions;
 
 export default selectorSlice.reducer;

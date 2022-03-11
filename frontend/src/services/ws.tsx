@@ -17,13 +17,16 @@ export const GameWsContext = React.createContext<GameWsContextInterface>(null);
 interface GameWsProps {
   children?: unknown;
   sessionId: string;
+  username: string;
 }
 
 export default function GameWsProvider(props: GameWsProps) {
   const dispatch = useAppDispatch();
 
   if (!ws) {
-    ws = new WebSocket(`${wsPath}/session/${props.sessionId}`);
+    ws = new WebSocket(
+      `${wsPath}/session/${props.sessionId}?username=${props.username}`,
+    );
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       handle(dispatch, data);

@@ -45,14 +45,18 @@ class WsServer:
 
     async def handle_session(self, request: web.Request) -> web.StreamResponse:
         # player must be added and session kept alive before returning control
-        # to the event loop
+        # to the event loop to prevent race conditions on session existing
         session_id: str = request.match_info["session_id"]
         if session_id not in self._manager:
             raise web.HTTPNotFound()
 
+        username: str = request.query.get("username", "")
+        if username == "":
+            raise web.HTTPBadRequest()
+
         ws = web.WebSocketResponse()
 
-        player_id = self._manager.add_player(session_id, ws)
+        player_id = self._manager.add_player(session_id, username, ws)
         logger.debug("%s joined session %s", player_id, session_id)
 
         await ws.prepare(request)

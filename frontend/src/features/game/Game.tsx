@@ -23,6 +23,8 @@ export default function Game(props: GameProps) {
     props.disconnect();
   }
 
+  const players = _.keyBy(gameState.players, (player) => player.id);
+
   function row(_value: undefined, i: number) {
     let letters = _.times(gameState.params.wordLength, emptyLetterGuess);
     if (i < gameState.previousGuesses.length) {
@@ -36,6 +38,7 @@ export default function Game(props: GameProps) {
         key={i}
         enabled={gameState.previousGuesses.length == i}
         letters={letters}
+        players={players}
         width={gameState.params.wordLength}
         onChange={(letters) => {
           if (letters.length == 0) {

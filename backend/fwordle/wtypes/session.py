@@ -63,10 +63,10 @@ class Session:
         self._event_task = asyncio.create_task(self._process_events())
         self._log = SessionLogAdapter(session_id, _logger)
 
-    def add_player(self, ws: web.WebSocketResponse) -> PlayerId:
-        player = Player.new(ws)
+    def add_player(self, username: str, ws: web.WebSocketResponse) -> PlayerId:
+        player = Player.new(username, ws)
         self.players.append(player)
-        self.game.on_player_added(player.id)
+        self.game.on_player_added(player)
         return player.id
 
     def remove_player(self, player_id: PlayerId) -> bool:
@@ -116,6 +116,8 @@ class Session:
                 broadcast = await self.game.event_queue().get()
                 self._log.debug("process broadcast: %s", broadcast)
                 await self.broadcast(broadcast.players, broadcast.event)
+            except asyncio.CancelledError:
+                return
             except Exception as e:
                 self._log.error(e)
 

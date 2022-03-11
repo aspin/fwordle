@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any, NamedTuple, List
 
 from fwordle import serializer
+from fwordle.wtypes.player import Player
 from fwordle.wtypes.common import PlayerId
 from fwordle.wtypes.game_parameters import GameParameters
 
@@ -27,7 +28,7 @@ class BroadcastEvent(NamedTuple):
 
 class Game(ABC):
     @abstractmethod
-    def on_player_added(self, player_id: PlayerId):
+    def on_player_added(self, player: Player):
         pass
 
     @abstractmethod
