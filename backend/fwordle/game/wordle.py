@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import random
 from typing import (
     Any,
     Dict,
@@ -114,8 +113,7 @@ class Wordle(wtypes.Game):
         self._log.debug("emitting event %s to player %s", event, player_id)
         self._event_queue.put_nowait(
             wtypes.BroadcastEvent(
-                [player_id],
-                wtypes.GameEvent(event.name, params),
+                [player_id], wtypes.GameEvent(event.name, params),
             )
         )
 
@@ -146,10 +144,22 @@ class Wordle(wtypes.Game):
         self._emit_all(WordleEvent.LETTER_DELETED, self._current_guess)
 
     def _handle_submit(self, player: wtypes.PlayerId, params: Any):
+        submission_count = cast(int, params)
+
+        # validation:
+        # - can't submit guess if not long enough
+        # - can't submit guess if all guesses already used up
+        # - can't submit n-th guess if n-th guess already submitted
         if (
             len(self._current_guess) != self.params.word_length
             or len(self._guesses) >= self.params.max_guesses
+            or len(self._guesses) != submission_count - 1
         ):
+            self._log.error("rejecting bad submission %s", submission_count)
+            return
+
+        if not self._dictionary.is_word(self._current_guess.join()):
+            self._emit_all(WordleEvent.SUBMISSION_NOT_A_WORD, submission_count)
             return
 
         last_guess = self._current_guess

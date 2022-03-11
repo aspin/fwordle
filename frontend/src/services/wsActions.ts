@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 
 export interface WsActionsInterface {
-  sendAddLetter: (string) => void;
+  sendAddLetter: (letter: string) => void;
   sendDeleteLetter: () => void;
-  submitGuess: () => void;
+  submitGuess: (count: number) => void;
   disconnect: () => void;
 }
 
@@ -23,10 +23,10 @@ function sendDeleteLetter(ws: WebSocket) {
   sendEvent(ws, event);
 }
 
-function submitGuess(ws: WebSocket) {
+function submitGuess(ws: WebSocket, count: number) {
   const event = {
     action: "SUBMIT_GUESS",
-    params: null,
+    params: count,
   };
   sendEvent(ws, event);
 }

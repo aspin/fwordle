@@ -63,7 +63,7 @@ export default function Game(props: GameProps) {
       gameState.currentLetters.filter((lg) => lg.letter != " ").length ==
       gameState.params.wordLength
     ) {
-      gameWs.actions.submitGuess();
+      gameWs.actions.submitGuess(gameState.previousGuesses.length + 1);
     }
   }
 

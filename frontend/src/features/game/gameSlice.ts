@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   emptyLetterGuess,
   GameGuessLetters,
+  GameGuessLetterState,
   GameParameters,
   Player,
 } from "../../types/game";
@@ -58,6 +59,11 @@ export const gameSlice = createSlice({
       state.previousGuesses.push(action.payload);
       state.currentLetters = _.times(state.params.wordLength, emptyLetterGuess);
     },
+    setBadGuess: (state, action: PayloadAction<number>) => {
+      state.currentLetters.forEach(
+        (lg) => (lg.state = GameGuessLetterState.Incorrect),
+      );
+    },
   },
 });
 
@@ -66,6 +72,7 @@ export const {
   setParams,
   setCurrentWord,
   setPlayers,
+  setBadGuess,
   submitGuess,
 } = gameSlice.actions;
 

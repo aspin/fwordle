@@ -20,9 +20,9 @@ class SessionManager:
     def __init__(self, closing_timeout_s: int, dictionary_path: str):
         self.sessions = {}
 
-        logger.info("Loading dictionary of English words...")
+        logger.info("loading dictionary of English words...")
         self._dictionary = english.load_length_dict(dictionary_path)
-        logger.info("Loaded %s words.", len(self._dictionary))
+        logger.info("loaded %s words", len(self._dictionary))
 
         self._closing_timeout_s = closing_timeout_s
         self._closing_tasks = {}
