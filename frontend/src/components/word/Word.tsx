@@ -6,35 +6,30 @@ import { GameGuessLetters, Player } from "../../types/game";
 interface WordProps {
   enabled: boolean;
   letters: GameGuessLetters;
-  players: Player[]; // TODO: decide on a better way for this
+  players: Map<string, Player>;
   width: number;
   onChange: (letter: string) => void;
 }
 
 export default function Word(props: WordProps) {
   function letter(_value: undefined, i: number) {
-    if (!props.letters[i]) {
-      debugger;
-    }
+    const lg = props.letters[i];
+
     // set focus on the first enabled empty spot
     let focus =
       props.enabled &&
-      props.letters[i].letter == " " &&
+      lg.letter == " " &&
       (i == 0 || props.letters[i - 1].letter != " ");
 
     // if last letter and is filled (e.g. all letters filled), keep focused
-    if (i == props.letters.length - 1 && props.letters[i].letter != " ") {
+    if (i == props.letters.length - 1 && lg.letter != " ") {
       focus = props.enabled;
     }
 
-    // TODO: improve this call
-    const player = props.players.filter(
-      (player) => player.id == props.letters[i].playerId,
-    );
-
+    const player = props.players[lg.playerId];
     let username = "";
-    if (player.length == 1) {
-      username = player[0].username;
+    if (player) {
+      username = player.username;
     }
 
     return (

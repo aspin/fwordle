@@ -79,10 +79,10 @@ class Wordle(wtypes.Game):
             WordleAction.SUBMIT_GUESS: self._handle_submit,
         }
 
-    def on_player_added(self, player_id: wtypes.PlayerId, username: str):
-        self._players.append(models.Player(player_id, username))
+    def on_player_added(self, player: wtypes.Player):
+        self._players.append(models.Player.from_impl(player))
 
-        self._emit(player_id, WordleEvent.LETTER_ADDED, self._current_guess)
+        self._emit(player.id, WordleEvent.LETTER_ADDED, self._current_guess)
         self._emit_all(WordleEvent.PLAYER_CHANGED, self._players)
 
     def on_player_removed(self, removed_player_id: wtypes.PlayerId):

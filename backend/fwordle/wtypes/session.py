@@ -66,7 +66,7 @@ class Session:
     def add_player(self, username: str, ws: web.WebSocketResponse) -> PlayerId:
         player = Player.new(username, ws)
         self.players.append(player)
-        self.game.on_player_added(player.id, username)
+        self.game.on_player_added(player)
         return player.id
 
     def remove_player(self, player_id: PlayerId) -> bool:

@@ -10,14 +10,22 @@ interface SessionConnectorProps {
 
 export default function SessionConnector(props: SessionConnectorProps) {
   const [username, setUsername] = useState<string>("");
+  const [isDirty, setIsDirty] = useState<boolean>(false);
+  const showError = isDirty && !username;
 
   function connect(e: ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
-    props.connect(e.target["session-id"].value, username);
+    setIsDirty(true);
+    if (username) {
+      props.connect(e.target["session-id"].value, username);
+    }
   }
 
   function create() {
-    props.create(username);
+    setIsDirty(true);
+    if (username) {
+      props.create(username);
+    }
   }
 
   return (
@@ -28,6 +36,7 @@ export default function SessionConnector(props: SessionConnectorProps) {
             <TextField
               label="Username"
               id="username"
+              error={showError}
               sx={{
                 width: "100%",
               }}
