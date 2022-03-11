@@ -37,6 +37,7 @@ export default function SessionConnector(props: SessionConnectorProps) {
               label="Username"
               id="username"
               error={showError}
+              helperText={showError && "Required"}
               sx={{
                 width: "100%",
               }}
