@@ -56,9 +56,7 @@ class WsServer:
 
         ws = web.WebSocketResponse()
 
-        player_id = self._manager.add_player(
-            session_id, username, ws
-        )
+        player_id = self._manager.add_player(session_id, username, ws)
         logger.debug("%s joined session %s", player_id, session_id)
 
         await ws.prepare(request)
