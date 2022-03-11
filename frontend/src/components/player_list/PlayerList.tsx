@@ -10,20 +10,21 @@ import {
   Typography,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
+import {Player} from "../../types/game";
 
 interface PlayerListProps {
-  players: string[];
+  players: Player[];
 }
 
 export default function PlayerList(props: PlayerListProps) {
-  function player(_value: string, i: number) {
+  function player(_value: Player, i: number) {
     let divider;
     if (i != props.players.length - 1) {
       divider = <Divider />;
     }
 
     return (
-      <React.Fragment key={props.players[i]}>
+      <React.Fragment key={props.players[i].id}>
         <ListItem>
           <ListItemAvatar>
             <Avatar>
@@ -31,8 +32,8 @@ export default function PlayerList(props: PlayerListProps) {
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={props.players[i]}
-            secondary={props.players[i]}
+            primary={props.players[i].username}
+            secondary={props.players[i].id}
           />
         </ListItem>
         {divider}

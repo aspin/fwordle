@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { Grid, Typography } from "@mui/material";
-import { setSessionId } from "./selectorSlice";
+import { setSessionId, setUsername } from "./selectorSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useNewSessionQuery } from "../../services/session";
 import SessionConnector from "../../components/session_connector/SessionConnector";
@@ -35,11 +35,13 @@ export default function Selector() {
     setReady(true);
     setGenerate(false);
     dispatch(setSessionId(selectedSessionId));
+    dispatch(setUsername(username));
   }
 
-  function createSession() {
+  function createSession(username: string) {
     setReady(true);
     setGenerate(true);
+    dispatch(setUsername(username));
   }
 
   function disconnect() {
@@ -58,7 +60,7 @@ export default function Selector() {
       );
     } else {
       return (
-        <GameWsProvider sessionId={sessionId}>
+        <GameWsProvider sessionId={sessionId} username={selectorState.username}>
           <Game sessionId={sessionId} disconnect={disconnect} />
         </GameWsProvider>
       );

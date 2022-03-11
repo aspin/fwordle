@@ -7,7 +7,12 @@ export interface GameParameters {
 
 export interface Session {
   id: string;
-  players: string[];
+  players: string[]; // TODO: currently unused
+}
+
+export interface Player {
+  id: string;
+  username: string;
 }
 
 export interface GameGuess {

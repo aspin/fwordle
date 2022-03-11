@@ -51,10 +51,10 @@ class WsServer:
         if session_id not in self._manager:
             raise web.HTTPNotFound()
 
-        if "username" not in request.query:
+        username: str = request.query.get("username", "")
+        if username == "":
             raise web.HTTPBadRequest()
 
-        username: str = request.query["username"]
         ws = web.WebSocketResponse()
 
         player_id = self._manager.add_player(

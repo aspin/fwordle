@@ -1,17 +1,23 @@
 import * as React from "react";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { Box, Button, Grid, Stack, TextField } from "@mui/material";
 
 interface SessionConnectorProps {
   connect: (sessionId: string, username: string) => void;
-  create: () => void;
+  create: (username: string) => void;
   sessionId: string;
 }
 
 export default function SessionConnector(props: SessionConnectorProps) {
+  const [username, setUsername] = useState<string>("");
+
   function connect(e: ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
-    props.connect(e.target["session-id"].value, e.target["username"].value);
+    props.connect(e.target["session-id"].value, username);
+  }
+
+  function create() {
+    props.create(username);
   }
 
   return (
@@ -25,6 +31,8 @@ export default function SessionConnector(props: SessionConnectorProps) {
               sx={{
                 width: "100%",
               }}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <TextField
               label="Session ID"
@@ -48,7 +56,7 @@ export default function SessionConnector(props: SessionConnectorProps) {
                 <Button
                   variant="contained"
                   color="secondary"
-                  onClick={props.create}
+                  onClick={create}
                   sx={{ width: "100%" }}
                 >
                   Create New
