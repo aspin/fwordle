@@ -78,26 +78,33 @@ export default function Game(props: GameProps) {
   }
 
   return (
-    <Grid container spacing={4}>
-      <Grid item xs={8}>
-        <Box component="form" onSubmit={submitGuess} autoComplete="off">
-          <Stack spacing={4}>
-            <Stack spacing={2}>
-              {[...Array(gameState.params.maxGuesses)].map(row)}
+    <React.Fragment>
+      <Grid container spacing={4}>
+        <Grid item xs={8}>
+          <Box component="form" onSubmit={submitGuess} autoComplete="off">
+            <Stack spacing={4}>
+              <Stack spacing={2}>
+                {[...Array(gameState.params.maxGuesses)].map(row)}
+              </Stack>
+              {/*submit button only to enable Enter submitting*/}
+              <Button
+                type="submit"
+                variant="outlined"
+                sx={{ display: "none" }}
+              />
+              <Keyboard guesses={gameState.previousGuesses} />
             </Stack>
-            {/*submit button only to enable Enter submitting*/}
-            <Button type="submit" variant="outlined" sx={{ display: "none" }} />
-            <Keyboard guesses={gameState.previousGuesses} />
-          </Stack>
-        </Box>
+          </Box>
+        </Grid>
+        <Grid item xs>
+          <Sidebar
+            players={gameState.players}
+            sessionId={props.sessionId}
+            disconnect={disconnect}
+          />
+        </Grid>
       </Grid>
-      <Grid item xs>
-        <Sidebar
-          players={gameState.players}
-          sessionId={props.sessionId}
-          disconnect={disconnect}
-        />
-      </Grid>
+      {/*TODO: this component needs work*/}
       <Dialog open={gameState.done}>
         <DialogTitle>Game complete</DialogTitle>
         <DialogContent>
@@ -109,6 +116,6 @@ export default function Game(props: GameProps) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-    </Grid>
+    </React.Fragment>
   );
 }
