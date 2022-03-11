@@ -1,7 +1,17 @@
 import * as React from "react";
 import { ChangeEvent, useContext } from "react";
 import { useAppSelector } from "../../hooks";
-import { Box, Button, Grid, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Stack,
+} from "@mui/material";
 import Word from "../../components/word/Word";
 import { GameWsContext } from "../../services/ws";
 import { emptyLetterGuess } from "../../types/game";
@@ -88,6 +98,17 @@ export default function Game(props: GameProps) {
           disconnect={disconnect}
         />
       </Grid>
+      <Dialog open={gameState.done}>
+        <DialogTitle>Game complete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {gameState.victory ? "You win!" : "You lose :("}
+          </DialogContentText>
+          <DialogActions>
+            <Button>Play Again</Button>
+          </DialogActions>
+        </DialogContent>
+      </Dialog>
     </Grid>
   );
 }
