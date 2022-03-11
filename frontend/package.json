@@ -1,7 +1,7 @@
 {
-  "name": "wordle-with-friends-frontend",
+  "name": "fwordle-frontend",
   "version": "0.1.0",
-  "description": "worlde, but with friends! the frontend",
+  "description": "wordle, but with friends! the frontend",
   "keywords": [
     "react",
     "webpack",
@@ -17,9 +17,9 @@
     "url": "git+https://github.com/vikpe/react-webpack-typescript-starter.git"
   },
   "bugs": {
-    "url": "https://github.com/vikpe/react-webpack-typescript-starter/issues"
+    "url": "https://github.com/aspin/fwordle/issues"
   },
-  "homepage": "https://github.com/vikpe/react-webpack-typescript-starter",
+  "homepage": "https://github.com/aspin/fwordle",
   "scripts": {
     "build": "yarn run clean-dist && webpack --config=configs/webpack/prod.js",
     "clean-dist": "rimraf dist/*",
