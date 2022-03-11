@@ -10,7 +10,9 @@ class Player:
     ws: web.WebSocketResponse
     username: str
 
-    def __init__(self, player_id: PlayerId, username: str, ws: web.WebSocketResponse):
+    def __init__(
+        self, player_id: PlayerId, username: str, ws: web.WebSocketResponse
+    ):
         self.id = player_id
         self.username = username
         self.ws = ws
