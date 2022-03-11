@@ -36,6 +36,7 @@ export default function Game(props: GameProps) {
         key={i}
         enabled={gameState.previousGuesses.length == i}
         letters={letters}
+        players={gameState.players}
         width={gameState.params.wordLength}
         onChange={(letters) => {
           if (letters.length == 0) {

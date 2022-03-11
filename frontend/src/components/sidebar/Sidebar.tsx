@@ -3,7 +3,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import PlayerList from "../player_list/PlayerList";
-import {Player} from "../../types/game";
+import { Player } from "../../types/game";
 
 interface SidebarProps {
   players: Player[];

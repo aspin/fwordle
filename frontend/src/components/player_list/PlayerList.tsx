@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
-import {Player} from "../../types/game";
+import { Player } from "../../types/game";
 
 interface PlayerListProps {
   players: Player[];

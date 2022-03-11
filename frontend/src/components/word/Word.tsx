@@ -1,11 +1,12 @@
 import * as React from "react";
 import Letter from "../letter/Letter";
 import { Stack } from "@mui/material";
-import { GameGuessLetters } from "../../types/game";
+import { GameGuessLetters, Player } from "../../types/game";
 
 interface WordProps {
   enabled: boolean;
   letters: GameGuessLetters;
+  players: Player[]; // TODO: decide on a better way for this
   width: number;
   onChange: (letter: string) => void;
 }
@@ -26,11 +27,22 @@ export default function Word(props: WordProps) {
       focus = props.enabled;
     }
 
+    // TODO: improve this call
+    const player = props.players.filter(
+      (player) => player.id == props.letters[i].playerId,
+    );
+
+    let username = "";
+    if (player.length == 1) {
+      username = player[0].username;
+    }
+
     return (
       <Letter
         key={i}
         enabled={focus}
         guess={props.letters[i]}
+        username={username}
         focus={focus}
         onChange={(letter) => props.onChange(letter)}
       />
