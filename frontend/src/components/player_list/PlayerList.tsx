@@ -9,7 +9,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import ImageIcon from "@mui/icons-material/Image";
+import PersonIcon from "@mui/icons-material/Person";
 import { Player } from "../../types/game";
 
 interface PlayerListProps {
@@ -28,7 +28,7 @@ export default function PlayerList(props: PlayerListProps) {
         <ListItem>
           <ListItemAvatar>
             <Avatar>
-              <ImageIcon />
+              <PersonIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText

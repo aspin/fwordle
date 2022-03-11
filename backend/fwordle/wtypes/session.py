@@ -116,6 +116,8 @@ class Session:
                 broadcast = await self.game.event_queue().get()
                 self._log.debug("process broadcast: %s", broadcast)
                 await self.broadcast(broadcast.players, broadcast.event)
+            except asyncio.CancelledError:
+                return
             except Exception as e:
                 self._log.error(e)
 
