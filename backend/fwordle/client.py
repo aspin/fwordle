@@ -26,7 +26,9 @@ async def create_session() -> str:
 
 async def connect_session(session_id: str):
     session = aiohttp.ClientSession()
-    ws = await session.ws_connect(f"ws://127.0.0.1:9000/session/{session_id}")
+    ws = await session.ws_connect(
+        f"ws://127.0.0.1:9000/session/{session_id}", params={"username": "bear"}
+    )
 
     game_parameters = await ws.receive()
     logger.info("session %s parameters: %s", session_id, game_parameters.data)
