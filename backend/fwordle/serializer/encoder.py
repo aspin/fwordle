@@ -1,4 +1,3 @@
-import enum
 import json
 from typing import Any, Dict, Callable
 

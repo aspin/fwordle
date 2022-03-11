@@ -44,7 +44,8 @@ class WsServer:
         )
 
     async def handle_session(self, request: web.Request) -> web.StreamResponse:
-        # player must be added and session kept alive before returning control to event loop
+        # player must be added and session kept alive before returning control
+        # to the event loop
         session_id: str = request.match_info["session_id"]
         if session_id not in self._manager:
             raise web.HTTPNotFound()
@@ -55,12 +56,16 @@ class WsServer:
         logger.debug("%s joined session %s", player_id, session_id)
 
         await ws.prepare(request)
-        await ws.send_json(self._manager.game_parameters(session_id), dumps=self._encoder)
+        await ws.send_json(
+            self._manager.game_parameters(session_id), dumps=self._encoder
+        )
 
         try:
             msg: aiohttp.WSMessage
             async for msg in ws:
-                action = serializer.decodes(wtypes.PlayerAction, msg.data, self._config.case)
+                action = serializer.decodes(
+                    wtypes.PlayerAction, msg.data, self._config.case
+                )
                 await self._manager.queue_action(session_id, player_id, action)
         finally:
             logger.debug("%s has left session %s", player_id, session_id)

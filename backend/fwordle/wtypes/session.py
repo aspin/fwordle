@@ -19,7 +19,10 @@ class SessionLogAdapter(logging.LoggerAdapter):
     _session_id: SessionId
 
     def __init__(
-        self, session_id: SessionId, logger: logging.Logger, extra: Optional[Mapping[str, object]] = None
+        self,
+        session_id: SessionId,
+        logger: logging.Logger,
+        extra: Optional[Mapping[str, object]] = None,
     ):
         if extra is None:
             extra = {}
@@ -45,7 +48,9 @@ class Session:
     _event_task: Future
     _log: logging.LoggerAdapter
 
-    def __init__(self, session_id: SessionId, game: Game, encoder: serializer.Encoder):
+    def __init__(
+        self, session_id: SessionId, game: Game, encoder: serializer.Encoder
+    ):
         self.id = session_id
         self.players = []
         self.game = game
@@ -66,12 +71,15 @@ class Session:
 
     def remove_player(self, player_id: PlayerId) -> bool:
         """
-        Removes a player from the session, and indicates if session is empty and should be closed.
+        Removes a player from the session, and indicates if session is empty
+        and should be closed.
 
         :param player_id: player to remove
         :return: if session is now empty
         """
-        self.players = [player for player in self.players if player.id != player_id]
+        self.players = [
+            player for player in self.players if player.id != player_id
+        ]
         return len(self.players) == 0
 
     async def queue_action(self, player_id: PlayerId, action: PlayerAction):
@@ -82,7 +90,11 @@ class Session:
         tasks = []
         for player in self.players:
             if broadcast_all or player.id in player_ids:
-                tasks.append(asyncio.create_task(player.ws.send_json(event, dumps=self._encoder)))
+                tasks.append(
+                    asyncio.create_task(
+                        player.ws.send_json(event, dumps=self._encoder)
+                    )
+                )
 
         await asyncio.wait(tasks)
 
@@ -93,7 +105,9 @@ class Session:
     async def _process_actions(self):
         while True:
             player_id, action = await self._action_queue.get()
-            self._log.debug("processing player action: %s => %s", player_id, action)
+            self._log.debug(
+                "processing player action: %s => %s", player_id, action
+            )
             self.game.process_action(player_id, action)
 
     async def _process_events(self):
