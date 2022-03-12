@@ -41,4 +41,4 @@ $ black .
 
 ## Protocol
 
-Documentation needs to be written!
+Documentation may or may not be written in the future.
