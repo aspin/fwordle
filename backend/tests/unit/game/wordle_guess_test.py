@@ -7,7 +7,7 @@ from fwordle.game.wordle_guess import WordleGuess, WordleLetterState
 
 @pytest.fixture
 def word_guess() -> WordleGuess:
-    wg = WordleGuess()
+    wg = WordleGuess(1)
     wg.append("a", "p1")
     wg.append("r", "p1")
     wg.append("i", "p1")
@@ -18,7 +18,7 @@ def word_guess() -> WordleGuess:
 
 @pytest.fixture
 def word_guess_multi_letter() -> WordleGuess:
-    wg = WordleGuess()
+    wg = WordleGuess(1)
     wg.append("g", "p1")
     wg.append("r", "p1")
     wg.append("e", "p1")
