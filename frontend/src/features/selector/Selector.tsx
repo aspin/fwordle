@@ -71,7 +71,7 @@ export default function Selector() {
     <Grid container rowSpacing={4}>
       <Grid item xs={12}>
         <Typography variant="h1" sx={{ textAlign: "center" }}>
-          fwordle
+          fwordle b
         </Typography>
       </Grid>
       <Grid item xs={12}>
