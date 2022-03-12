@@ -1,4 +1,4 @@
-# fwordle
+# [fwordle](http://fwordle.me/) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/aspin/fwordle/blob/main/LICENSE)
 
 fwordle: Wordle, but with friends!
 
