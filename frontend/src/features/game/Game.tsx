@@ -1,7 +1,17 @@
 import * as React from "react";
 import { ChangeEvent, useContext } from "react";
 import { useAppSelector } from "../../hooks";
-import { Box, Button, Grid, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Stack,
+} from "@mui/material";
 import Word from "../../components/word/Word";
 import { GameWsContext } from "../../services/ws";
 import { emptyLetterGuess } from "../../types/game";
@@ -63,31 +73,49 @@ export default function Game(props: GameProps) {
       gameState.currentLetters.filter((lg) => lg.letter != " ").length ==
       gameState.params.wordLength
     ) {
-      gameWs.actions.submitGuess();
+      gameWs.actions.submitGuess(gameState.previousGuesses.length + 1);
     }
   }
 
   return (
-    <Grid container spacing={4}>
-      <Grid item xs={8}>
-        <Box component="form" onSubmit={submitGuess} autoComplete="off">
-          <Stack spacing={4}>
-            <Stack spacing={2}>
-              {[...Array(gameState.params.maxGuesses)].map(row)}
+    <React.Fragment>
+      <Grid container spacing={4}>
+        <Grid item xs={8}>
+          <Box component="form" onSubmit={submitGuess} autoComplete="off">
+            <Stack spacing={4}>
+              <Stack spacing={2}>
+                {[...Array(gameState.params.maxGuesses)].map(row)}
+              </Stack>
+              {/*submit button only to enable Enter submitting*/}
+              <Button
+                type="submit"
+                variant="outlined"
+                sx={{ display: "none" }}
+              />
+              <Keyboard guesses={gameState.previousGuesses} />
             </Stack>
-            {/*submit button only to enable Enter submitting*/}
-            <Button type="submit" variant="outlined" sx={{ display: "none" }} />
-            <Keyboard guesses={gameState.previousGuesses} />
-          </Stack>
-        </Box>
+          </Box>
+        </Grid>
+        <Grid item xs>
+          <Sidebar
+            players={gameState.players}
+            sessionId={props.sessionId}
+            disconnect={disconnect}
+          />
+        </Grid>
       </Grid>
-      <Grid item xs>
-        <Sidebar
-          players={gameState.players}
-          sessionId={props.sessionId}
-          disconnect={disconnect}
-        />
-      </Grid>
-    </Grid>
+      {/*TODO: this component needs work*/}
+      <Dialog open={gameState.done}>
+        <DialogTitle>Game complete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {gameState.victory ? "You win!" : "You lose :("}
+          </DialogContentText>
+          <DialogActions>
+            <Button>Play Again</Button>
+          </DialogActions>
+        </DialogContent>
+      </Dialog>
+    </React.Fragment>
   );
 }

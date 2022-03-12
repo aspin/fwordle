@@ -1,4 +1,5 @@
 import { green, red, yellow } from "@mui/material/colors";
+import * as _ from "lodash";
 
 export interface GameParameters {
   maxGuesses: number;
@@ -17,6 +18,7 @@ export interface Player {
 
 export interface GameGuess {
   letters: GameGuessLetters;
+  index: number;
 }
 
 export type GameGuessLetters = GameGuessLetter[];
@@ -33,6 +35,10 @@ export function emptyLetterGuess(): GameGuessLetter {
     playerId: "",
     state: GameGuessLetterState.Unknown,
   };
+}
+
+export function correctGuess(letters: GameGuessLetters): boolean {
+  return _.every(letters, (lg) => lg.state == GameGuessLetterState.Correct);
 }
 
 export enum GameGuessLetterState {

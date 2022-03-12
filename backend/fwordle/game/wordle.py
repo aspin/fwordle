@@ -12,7 +12,7 @@ from typing import (
     Mapping,
 )
 
-from fwordle import wtypes, models
+from fwordle import wtypes, models, language
 from fwordle.game.wordle_events import WordleAction, WordleEvent
 from fwordle.game.wordle_guess import WordleGuess
 
@@ -24,6 +24,7 @@ class Wordle(wtypes.Game):
     chosen_word: str
 
     _session_id: wtypes.SessionId
+    _dictionary: language.LengthDictionary
     _current_guess: WordleGuess
     _guesses: List[WordleGuess]
 
@@ -64,9 +65,10 @@ class Wordle(wtypes.Game):
                 )
             return ""
 
-    def __init__(self, session_id: str):
+    def __init__(self, session_id: str, dictionary: language.LengthDictionary):
         self._session_id = session_id
-        self._current_guess = WordleGuess()
+        self._dictionary = dictionary
+        self._current_guess = WordleGuess(1)
         self._guesses = []
         self._event_queue = asyncio.Queue()
         self._players = []
@@ -93,7 +95,7 @@ class Wordle(wtypes.Game):
 
     def set_parameters(self, game_parameters: wtypes.GameParameters):
         self.params = game_parameters
-        self.chosen_word = self._generate_word()
+        self.chosen_word = self._dictionary.generate(self.params.word_length)
 
     def process_action(
         self, player: wtypes.PlayerId, player_action: wtypes.PlayerAction
@@ -104,9 +106,6 @@ class Wordle(wtypes.Game):
 
     def event_queue(self) -> "asyncio.Queue[wtypes.BroadcastEvent]":
         return self._event_queue
-
-    def _generate_word(self) -> str:
-        return "raise"
 
     def _emit(
         self, player_id: wtypes.PlayerId, event: WordleEvent, params: Any
@@ -146,14 +145,26 @@ class Wordle(wtypes.Game):
         self._emit_all(WordleEvent.LETTER_DELETED, self._current_guess)
 
     def _handle_submit(self, player: wtypes.PlayerId, params: Any):
+        submission_count = cast(int, params)
+
+        # validation:
+        # - can't submit guess if not long enough
+        # - can't submit guess if all guesses already used up
+        # - can't submit n-th guess if n-th guess already submitted
         if (
             len(self._current_guess) != self.params.word_length
             or len(self._guesses) >= self.params.max_guesses
+            or len(self._guesses) != submission_count - 1
         ):
+            self._log.error("rejecting bad submission %s", submission_count)
+            return
+
+        if not self._dictionary.is_word(self._current_guess.join()):
+            self._emit_all(WordleEvent.SUBMISSION_NOT_A_WORD, submission_count)
             return
 
         last_guess = self._current_guess
         last_guess.verify(self.chosen_word)
         self._guesses.append(last_guess)
-        self._current_guess = WordleGuess()
+        self._current_guess = WordleGuess(submission_count + 1)
         self._emit_all(WordleEvent.SUBMISSION_RESULT, last_guess)

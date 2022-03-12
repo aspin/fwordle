@@ -1,12 +1,13 @@
 import { AppDispatch } from "../store";
 import {
+  setBadGuess,
   setConnected,
   setCurrentWord,
   setParams,
   setPlayers,
   submitGuess,
 } from "../features/game/gameSlice";
-import {GameGuess, Player} from "../types/game";
+import { GameGuess, Player } from "../types/game";
 
 function handle(dispatch: AppDispatch, data: object) {
   // TODO: should really determine game params vs event better...
@@ -51,7 +52,10 @@ function handleEvent(dispatch: AppDispatch, data: GameEvent) {
       dispatch(setPlayers(data.params as Player[]));
       break;
     case "SUBMISSION_RESULT":
-      dispatch(submitGuess((data.params as GameGuess).letters));
+      dispatch(submitGuess(data.params as GameGuess));
+      break;
+    case "SUBMISSION_NOT_A_WORD":
+      dispatch(setBadGuess(data.params as number));
       break;
   }
 }

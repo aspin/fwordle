@@ -6,6 +6,7 @@ from typing import Dict
 from aiohttp import web
 
 from fwordle import wtypes, game, serializer
+from fwordle.language import english
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +17,13 @@ class SessionManager:
     _closing_timeout_s: int
     _closing_tasks: Dict[wtypes.SessionId, Future]
 
-    def __init__(self, closing_timeout_s: int):
+    def __init__(self, closing_timeout_s: int, dictionary_path: str):
         self.sessions = {}
+
+        logger.info("loading dictionary of English words...")
+        self._dictionary = english.load_length_dict(dictionary_path)
+        logger.info("loaded %s words", len(self._dictionary))
+
         self._closing_timeout_s = closing_timeout_s
         self._closing_tasks = {}
 
@@ -26,7 +32,9 @@ class SessionManager:
 
     def create_new(self, encoder: serializer.Encoder) -> wtypes.Session:
         session_id = wtypes.Session.generate_id()
-        session = wtypes.Session(session_id, game.Wordle(session_id), encoder)
+        session = wtypes.Session(
+            session_id, game.Wordle(session_id, self._dictionary), encoder
+        )
         self.sessions[session.id] = session
 
         # prepare to timeout session if no one joins in 10x the usual interval
