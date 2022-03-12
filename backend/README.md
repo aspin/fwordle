@@ -2,31 +2,38 @@
 
 fwordle: Wordle, but with friends!
 
-Python backend server component. Essentially a simple websockets server with a
-Wordle game interface.
+Python backend server component. Essentially a simple websockets server with a Wordle game interface.
 
-## Get Started
-
-Start:
+## Installation
 
 ```
+$ git clone https://github.com/aspin/fwordle.git
 $ pip install -r requirements.txt
+```
+
+## Usage
+
+**Run**
+
+```
 $ PYTHONPATH=./ python fwordle/main.py --dictionary-path data_files/words_alpha.txt
 ```
 
-Test:
+- App served @ `http://localhost:9000` / `ws://localhost:9000`
+
+**Test**
 
 ```
 $ pytest
 ```
 
-Lint:
+**Lint**
 
 ```
 $ flake8 . --count
 ```
 
-Format:
+**Format**
 
 ```
 $ black .
