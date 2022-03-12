@@ -38,8 +38,7 @@ jobs:
         chmod 600 "$SSH_PATH/deploy_key"
 
     - name: Copy deploy script
-        scp -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no run-backend.sh ${{ secrets.BACKEND_USER }}@${{ secrets.BACKENDEND_HOST }}:run-backend.sh
+      run: scp -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no run-backend.sh ${{ secrets.BACKEND_USER }}@${{ secrets.BACKENDEND_HOST }}:run-backend.sh
 
     - name: Deploy new image
-      run: |
-        ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.BACKEND_USER }}@${{ secrets.BACKEND_HOST }} ./run-backend.sh
+      run: ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.BACKEND_USER }}@${{ secrets.BACKEND_HOST }} ./run-backend.sh
