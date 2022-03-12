@@ -5,7 +5,7 @@ import { generateActions, WsActionsInterface } from "./wsActions";
 import { setConnected } from "../features/game/gameSlice";
 
 let ws;
-const wsPath = "ws://localhost:9000";
+const wsPath = `ws://${process.env.WS_URL}`;
 
 interface GameWsContextInterface {
   ws: WebSocket;
