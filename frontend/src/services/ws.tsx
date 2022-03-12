@@ -5,8 +5,6 @@ import { generateActions, WsActionsInterface } from "./wsActions";
 import { setConnected } from "../features/game/gameSlice";
 
 let ws;
-const wsPath = `ws://${process.env.WS_URL}`;
-
 interface GameWsContextInterface {
   ws: WebSocket;
   actions: WsActionsInterface;
@@ -25,7 +23,7 @@ export default function GameWsProvider(props: GameWsProps) {
 
   if (!ws) {
     ws = new WebSocket(
-      `${wsPath}/session/${props.sessionId}?username=${props.username}`,
+      `${process.env.WS_URL}/session/${props.sessionId}?username=${props.username}`,
     );
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
