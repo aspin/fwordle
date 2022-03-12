@@ -35,4 +35,4 @@ jobs:
         chmod 700 "$SSH_PATH"
         chmod 600 "$SSH_PATH/deploy_key"
 
-        scp -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no -r frontend/dist/* ${{ secrets.FRONTEND_USER }}@${{ secrets.FRONTEND_HOST }}:/var/www/fwordle.me/htmldebug/
+        scp -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no -r dist/* ${{ secrets.FRONTEND_USER }}@${{ secrets.FRONTEND_HOST }}:/var/www/fwordle.me/htmldebug/
