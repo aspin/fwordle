@@ -1,4 +1,3 @@
 aiohttp==3.8.1
-humps==0.2.2
 pyhumps==3.5.3
 pytest==7.0.1
