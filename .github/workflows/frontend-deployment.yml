@@ -29,4 +29,5 @@ jobs:
     - name: SCP 
       run: |
         echo "${{ secrets.FRONTEND_SSH_KEY }}" > $HOME/.ssh/id_ed25519
+        ls $HOME/.ssh
         scp -i $HOME/.ssh/id_ed25519 -r frontend/dist/* ${{ secrets.FRONTEND_USER }}@${{ secrets.FRONTEND_HOST }}:/var/www/fwordle.me/htmldebug/
