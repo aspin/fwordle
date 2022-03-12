@@ -1,0 +1,38 @@
+name: Deploy Frontend
+
+on: 
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 16.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+
+    - name: Build
+      run: |
+        npm install
+        npm run build
+
+    - name: Copy compiled frontend
+      run: |
+        SSH_PATH="$HOME/.ssh"
+        mkdir -p "$SSH_PATH"
+
+        echo "${{ secrets.FRONTEND_SSH_KEY }}" > $SSH_PATH/deploy_key
+        chmod 700 "$SSH_PATH"
+        chmod 600 "$SSH_PATH/deploy_key"
+
+        scp -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no -r dist/* ${{ secrets.FRONTEND_USER }}@${{ secrets.FRONTEND_HOST }}:/var/www/fwordle.me/html/

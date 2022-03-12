@@ -1,0 +1,44 @@
+name: Deploy Backend
+
+on: 
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build the Docker image
+      run: docker build . --tag aspin/fwordle-backend:latest
+
+    - name: Docker Login
+      uses: docker/login-action@v1.14.1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Push the Docker image
+      run: docker push aspin/fwordle-backend:latest
+
+    - name: Setup SSH
+      run: |
+        SSH_PATH="$HOME/.ssh"
+        mkdir -p "$SSH_PATH"
+
+        echo "${{ secrets.BACKEND_SSH_KEY }}" > $SSH_PATH/deploy_key
+        chmod 700 "$SSH_PATH"
+        chmod 600 "$SSH_PATH/deploy_key"
+
+    - name: Copy deploy script
+      run: scp -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no run-backend.sh ${{ secrets.BACKEND_USER }}@${{ secrets.BACKENDEND_HOST }}:run-backend.sh
+
+    - name: Deploy new image
+      run: ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.BACKEND_USER }}@${{ secrets.BACKEND_HOST }} ./run-backend.sh

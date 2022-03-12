@@ -8,9 +8,9 @@ from fwordle.serializer import Case
 
 logger = logging.getLogger(__name__)
 
-endpoint = "api.fwordle.me"
+# endpoint = "api.fwordle.me"
 # endpoint = "167.172.140.191:9000"
-# endpoint = "127.0.0.1:9000"
+endpoint = "127.0.0.1:9000"
 
 
 async def main():
