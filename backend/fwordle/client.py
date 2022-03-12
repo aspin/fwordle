@@ -8,6 +8,10 @@ from fwordle.serializer import Case
 
 logger = logging.getLogger(__name__)
 
+endpoint = "api.fwordle.me"
+# endpoint = "167.172.140.191:9000"
+# endpoint = "127.0.0.1:9000"
+
 
 async def main():
     session_id = await create_session()
@@ -18,7 +22,7 @@ async def main():
 
 async def create_session() -> str:
     async with aiohttp.ClientSession() as session:
-        async with session.get("http://127.0.0.1:9000/new") as response:
+        async with session.get(f"http://{endpoint}/new") as response:
             response_json = await response.json()
             session = serializer.decode(models.Session, response_json)
             return session.id
@@ -27,7 +31,7 @@ async def create_session() -> str:
 async def connect_session(session_id: str):
     session = aiohttp.ClientSession()
     ws = await session.ws_connect(
-        f"ws://127.0.0.1:9000/session/{session_id}", params={"username": "bear"}
+        f"ws://{endpoint}/session/{session_id}", params={"username": "bear"}
     )
 
     game_parameters = await ws.receive()
