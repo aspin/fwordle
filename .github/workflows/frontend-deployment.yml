@@ -28,10 +28,10 @@ jobs:
 
     - name: SCP 
       run: |
-        local SSH_PATH="$HOME/.ssh"
+        SSH_PATH="$HOME/.ssh"
         mkdir -p "$SSH_PATH"
 
-        echo "${{ secrets.FRONTEND_SSH_KEY }}" > $HOME/.ssh/deploy_key
+        echo "${{ secrets.FRONTEND_SSH_KEY }}" > $SSH_PATH/deploy_key
         chmod 700 "$SSH_PATH"
         chmod 600 "$SSH_PATH/deploy_key"
 
