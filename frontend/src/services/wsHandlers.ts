@@ -52,7 +52,7 @@ function handleEvent(dispatch: AppDispatch, data: GameEvent) {
       dispatch(setPlayers(data.params as Player[]));
       break;
     case "SUBMISSION_RESULT":
-      dispatch(submitGuess((data.params as GameGuess).letters));
+      dispatch(submitGuess(data.params as GameGuess));
       break;
     case "SUBMISSION_NOT_A_WORD":
       dispatch(setBadGuess(data.params as number));

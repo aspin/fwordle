@@ -22,15 +22,17 @@ class WordleLetterGuess(serializer.Simple):
 
 class WordleGuess(serializer.Simple):
     letters: List[WordleLetterGuess]
+    index: int
 
-    def __init__(self):
+    def __init__(self, index: int):
         self.letters = []
+        self.index = index
 
     def __len__(self):
         return len(self.letters)
 
     def __repr__(self):
-        return f"WordleGuess({self.join()})"
+        return f"WordleGuess({self.index}, {self.join()})"
 
     def __str__(self):
         return repr(self)

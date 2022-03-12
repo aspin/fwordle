@@ -68,7 +68,7 @@ class Wordle(wtypes.Game):
     def __init__(self, session_id: str, dictionary: language.LengthDictionary):
         self._session_id = session_id
         self._dictionary = dictionary
-        self._current_guess = WordleGuess()
+        self._current_guess = WordleGuess(1)
         self._guesses = []
         self._event_queue = asyncio.Queue()
         self._players = []
@@ -166,5 +166,5 @@ class Wordle(wtypes.Game):
         last_guess = self._current_guess
         last_guess.verify(self.chosen_word)
         self._guesses.append(last_guess)
-        self._current_guess = WordleGuess()
+        self._current_guess = WordleGuess(submission_count + 1)
         self._emit_all(WordleEvent.SUBMISSION_RESULT, last_guess)

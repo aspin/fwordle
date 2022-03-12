@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   correctGuess,
   emptyLetterGuess,
+  GameGuess,
   GameGuessLetters,
   GameGuessLetterState,
   GameParameters,
@@ -60,11 +61,21 @@ export const gameSlice = createSlice({
     setPlayers: (state, action: PayloadAction<Player[]>) => {
       state.players = action.payload;
     },
-    submitGuess: (state, action: PayloadAction<GameGuessLetters>) => {
-      state.previousGuesses.push(action.payload);
+    submitGuess: (state, action: PayloadAction<GameGuess>) => {
+      if (action.payload.index != state.previousGuesses.length + 1) {
+        console.error(
+          "received info about unexpected guess: ",
+          action.payload,
+          " vs ",
+          state.previousGuesses.length + 1,
+        );
+        return;
+      }
+
+      state.previousGuesses.push(action.payload.letters);
       state.currentLetters = _.times(state.params.wordLength, emptyLetterGuess);
 
-      if (correctGuess(action.payload)) {
+      if (correctGuess(action.payload.letters)) {
         state.victory = true;
         state.done = true;
       } else if (state.previousGuesses.length == state.params.maxGuesses) {

@@ -18,6 +18,7 @@ export interface Player {
 
 export interface GameGuess {
   letters: GameGuessLetters;
+  index: number;
 }
 
 export type GameGuessLetters = GameGuessLetter[];
