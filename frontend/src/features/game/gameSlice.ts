@@ -72,6 +72,15 @@ export const gameSlice = createSlice({
       }
     },
     setBadGuess: (state, action: PayloadAction<number>) => {
+      if (action.payload != state.previousGuesses.length + 1) {
+        console.error(
+          "received info about unexpected guess: ",
+          action.payload,
+          " vs ",
+          state.previousGuesses.length + 1,
+        );
+        return;
+      }
       state.currentLetters.forEach(
         (lg) => (lg.state = GameGuessLetterState.Incorrect),
       );
