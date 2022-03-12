@@ -113,7 +113,8 @@ class Wordle(wtypes.Game):
         self._log.debug("emitting event %s to player %s", event, player_id)
         self._event_queue.put_nowait(
             wtypes.BroadcastEvent(
-                [player_id], wtypes.GameEvent(event.name, params),
+                [player_id],
+                wtypes.GameEvent(event.name, params),
             )
         )
 

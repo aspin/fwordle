@@ -80,5 +80,5 @@ class WsServer:
         return ws
 
 
-def build() -> WsServer:
-    return WsServer(config.App())
+def build(app_config: config.App) -> WsServer:
+    return WsServer(app_config)
