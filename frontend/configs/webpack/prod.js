@@ -16,8 +16,8 @@ module.exports = merge(commonConfig, {
   devtool: "source-map",
   plugins: [
     new webpack.DefinePlugin({
-      "process.env.API_URL": JSON.stringify("http://api.fwordle.me"),
-      "process.env.WS_URL": JSON.stringify("ws://api.fwordle.me"),
+      "process.env.API_URL": JSON.stringify("https://api.fwordle.me"),
+      "process.env.WS_URL": JSON.stringify("wss://api.fwordle.me"),
     }),
   ],
 });
