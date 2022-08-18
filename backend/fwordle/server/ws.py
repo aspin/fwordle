@@ -3,7 +3,7 @@ import logging
 import aiohttp
 from aiohttp import web
 
-from fwordle import serializer, config, models, wtypes
+from fwordle import serializer, config, models, wtypes, messages
 from fwordle.server.session import SessionManager
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,8 @@ class WsServer:
 
         await ws.prepare(request)
         await ws.send_json(
-            self._manager.game_parameters(session_id), dumps=self._encoder
+            messages.GameParameters(self._manager.game_parameters(session_id)),
+            dumps=self._encoder,
         )
 
         try:
